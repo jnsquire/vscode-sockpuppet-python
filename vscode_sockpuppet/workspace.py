@@ -322,6 +322,109 @@ class Workspace:
         )
         return TextDocument(self.client, data)
 
+    def find_files(
+        self,
+        include: str,
+        exclude: Optional[str] = None,
+        max_results: Optional[int] = None,
+    ) -> list[str]:
+        """
+        Find files across all workspace folders.
+
+        Args:
+            include: Glob pattern for files to search for
+                (e.g., '**/*.py', '**/*.{js,ts}')
+            exclude: Glob pattern for files/folders to exclude
+                (e.g., '**/node_modules/**'). Use None for default
+                excludes (files.exclude setting)
+            max_results: Maximum number of results to return
+
+        Returns:
+            List of file URIs matching the pattern
+
+        Example:
+            # Find all Python files
+            files = client.workspace.find_files('**/*.py')
+
+            # Find JavaScript files, excluding node_modules
+            files = client.workspace.find_files(
+                '**/*.js',
+                '**/node_modules/**'
+            )
+
+            # Limit results
+            files = client.workspace.find_files('**/*.ts', max_results=10)
+        """
+        result = self.client._send_request(
+            "workspace.findFiles",
+            {
+                "include": include,
+                "exclude": exclude,
+                "maxResults": max_results,
+            },
+        )
+        return result["files"]
+
+    def get_workspace_folder(self, uri: str) -> Optional[dict]:
+        """
+        Get the workspace folder that contains a given URI.
+
+        Args:
+            uri: The URI to find the workspace folder for
+
+        Returns:
+            Workspace folder dict (uri, name, index) or None if not found
+
+        Example:
+            folder = client.workspace.get_workspace_folder(
+                'file:///path/to/file.py'
+            )
+            if folder:
+                print(f"File is in workspace: {folder['name']}")
+        """
+        result = self.client._send_request(
+            "workspace.getWorkspaceFolder", {"uri": uri}
+        )
+        return result["folder"]
+
+    def as_relative_path(
+        self, path_or_uri: str, include_workspace_folder: bool = False
+    ) -> str:
+        """
+        Convert a path or URI to a workspace-relative path.
+
+        Args:
+            path_or_uri: Absolute path or URI to convert
+            include_workspace_folder: Whether to prepend workspace
+                folder name when multiple folders exist
+
+        Returns:
+            Path relative to workspace root, or original input if not
+            in workspace
+
+        Example:
+            # Convert absolute path
+            rel_path = client.workspace.as_relative_path(
+                '/Users/name/project/src/main.py'
+            )
+            # Returns: 'src/main.py'
+
+            # With workspace folder name (when multiple folders)
+            rel_path = client.workspace.as_relative_path(
+                '/Users/name/project/src/main.py',
+                include_workspace_folder=True
+            )
+            # Returns: 'project-name/src/main.py'
+        """
+        result = self.client._send_request(
+            "workspace.asRelativePath",
+            {
+                "pathOrUri": path_or_uri,
+                "includeWorkspaceFolder": include_workspace_folder,
+            },
+        )
+        return result["relativePath"]
+
     def get_configuration(
         self, section: Optional[str] = None, scope: Optional[str] = None
     ) -> WorkspaceConfiguration:
