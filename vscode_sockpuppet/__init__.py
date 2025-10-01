@@ -28,13 +28,14 @@ from .tabs import Tab, TabGroup, TabGroups
 from .terminal import Terminal
 from .webview import WebviewOptions, WebviewPanel
 from .window import Window
-from .workspace import Workspace
+from .workspace import Environment, Workspace
 
 __version__ = "0.1.0"
 __all__ = [
     "VSCodeClient",
     "Window",
     "Workspace",
+    "Environment",
     "Editor",
     "EditBuilder",
     "TextDocument",

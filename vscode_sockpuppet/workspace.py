@@ -13,12 +13,197 @@ if TYPE_CHECKING:
     from .filewatcher import FileSystemWatcher
 
 
+class Environment:
+    """VS Code environment properties and methods."""
+
+    def __init__(self, client: "VSCodeClient"):
+        self.client = client
+        self._cached_properties = {}
+
+    def _get_property(self, prop_name: str):
+        """Get an environment property, with caching."""
+        if prop_name not in self._cached_properties:
+            result = self.client._send_request(f"env.{prop_name}")
+            self._cached_properties[prop_name] = result
+        return self._cached_properties[prop_name]
+
+    @property
+    def app_name(self) -> str:
+        """
+        The application name of the editor, like 'VS Code'.
+
+        Returns:
+            Application name
+
+        Example:
+            print(f"Running in: {client.workspace.env.app_name}")
+        """
+        return self._get_property("appName")
+
+    @property
+    def app_root(self) -> str:
+        """
+        The application root folder from which the editor is running.
+
+        Returns:
+            Application root path (empty string if not applicable)
+
+        Example:
+            print(f"App root: {client.workspace.env.app_root}")
+        """
+        return self._get_property("appRoot")
+
+    @property
+    def language(self) -> str:
+        """
+        The UI language of VS Code.
+
+        Returns:
+            Language identifier (e.g., 'en', 'de', 'zh-cn')
+
+        Example:
+            if client.workspace.env.language == 'en':
+                print("English UI")
+        """
+        return self._get_property("language")
+
+    @property
+    def machine_id(self) -> str:
+        """
+        A unique identifier for the machine.
+
+        Returns:
+            Machine identifier (anonymized)
+
+        Example:
+            print(f"Machine ID: {client.workspace.env.machine_id}")
+        """
+        return self._get_property("machineId")
+
+    @property
+    def session_id(self) -> str:
+        """
+        A unique identifier for the current session.
+
+        Returns:
+            Session identifier
+
+        Example:
+            print(f"Session: {client.workspace.env.session_id}")
+        """
+        return self._get_property("sessionId")
+
+    @property
+    def uri_scheme(self) -> str:
+        """
+        The custom URI scheme the editor registers in the OS.
+
+        Returns:
+            URI scheme (typically 'vscode' or 'vscode-insiders')
+
+        Example:
+            print(f"URI scheme: {client.workspace.env.uri_scheme}")
+        """
+        return self._get_property("uriScheme")
+
+    @property
+    def shell(self) -> str:
+        """
+        The detected default shell for the extension host.
+
+        Returns:
+            Path to the default shell
+
+        Example:
+            print(f"Default shell: {client.workspace.env.shell}")
+        """
+        return self._get_property("shell")
+
+    @property
+    def ui_kind(self) -> int:
+        """
+        The UI kind property indicates from which UI extensions are accessed.
+
+        Returns:
+            UI kind (1 = Desktop, 2 = Web)
+
+        Example:
+            if client.workspace.env.ui_kind == 1:
+                print("Running in desktop VS Code")
+            else:
+                print("Running in web VS Code")
+        """
+        return self._get_property("uiKind")
+
+    def write_clipboard(self, text: str) -> None:
+        """
+        Write text to clipboard.
+
+        Args:
+            text: The text to write
+
+        Example:
+            client.workspace.env.write_clipboard("Hello, clipboard!")
+        """
+        self.client._send_request("env.clipboard.writeText", {"text": text})
+
+    def read_clipboard(self) -> str:
+        """
+        Read text from clipboard.
+
+        Returns:
+            The clipboard text
+
+        Example:
+            text = client.workspace.env.read_clipboard()
+            print(f"Clipboard: {text}")
+        """
+        return self.client._send_request("env.clipboard.readText")
+
+    def open_external(self, uri: str) -> bool:
+        """
+        Open an external URI in the default application.
+
+        Args:
+            uri: The URI to open (http, https, mailto, etc.)
+
+        Returns:
+            True if successful
+
+        Example:
+            # Open URL in browser
+            client.workspace.env.open_external("https://code.visualstudio.com")
+
+            # Open email client
+            client.workspace.env.open_external("mailto:user@example.com")
+        """
+        return self.client._send_request("env.openExternal", {"uri": uri})
+
+
 class Workspace:
     """VS Code workspace operations."""
 
     def __init__(self, client: "VSCodeClient"):
         self.client = client
         self._events = WorkspaceEvents(client)
+        self._env: Optional[Environment] = None
+
+    @property
+    def env(self) -> Environment:
+        """
+        Access environment properties and methods.
+
+        Returns:
+            Environment object with properties and methods
+
+        Example:
+            print(f"Running in: {client.workspace.env.app_name}")
+            print(f"UI Language: {client.workspace.env.language}")
+            client.workspace.env.open_external("https://example.com")
+        """
+        if self._env is None:
+            self._env = Environment(self.client)
+        return self._env
 
     # Event subscriptions (VS Code-style API)
     @property
@@ -122,41 +307,6 @@ class Workspace:
         )
         return TextDocument(self.client, data)
 
-    def write_to_clipboard(self, text: str) -> dict:
-        """
-        Write text to clipboard.
-
-        Args:
-            text: The text to write
-
-        Returns:
-            Success status
-        """
-        return self.client._send_request(
-            "env.clipboard.writeText", {"text": text}
-        )
-
-    def read_from_clipboard(self) -> str:
-        """
-        Read text from clipboard.
-
-        Returns:
-            The clipboard text
-        """
-        return self.client._send_request("env.clipboard.readText")
-
-    def open_external(self, uri: str) -> bool:
-        """
-        Open an external URI.
-
-        Args:
-            uri: The URI to open
-
-        Returns:
-            True if successful
-        """
-        return self.client._send_request("env.openExternal", {"uri": uri})
-
     def get_configuration(
         self, section: Optional[str] = None, scope: Optional[str] = None
     ) -> WorkspaceConfiguration:
@@ -195,7 +345,8 @@ class Workspace:
         Create a file system watcher for the given glob pattern.
 
         Args:
-            glob_pattern: Glob pattern to watch (e.g., '**/*.py', '**/*.{js,ts}')
+            glob_pattern: Glob pattern to watch
+                (e.g., '**/*.py', '**/*.{js,ts}')
             ignore_create_events: Don't fire events when files are created
             ignore_change_events: Don't fire events when files are changed
             ignore_delete_events: Don't fire events when files are deleted
