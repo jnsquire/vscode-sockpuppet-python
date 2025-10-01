@@ -131,6 +131,51 @@ class WebviewPanel:
             "window.postMessageToWebview", {"id": self._id, "message": message}
         )
 
+    def as_webview_uri(self, local_uri: str) -> str:
+        """
+        Convert a local file URI to a webview URI.
+
+        Webviews cannot directly load resources from the workspace or local
+        file system using file: URIs. This method converts a local file:
+        URI into a URI that can be used inside the webview to load the same
+        resource.
+
+        The local resource must be in a directory listed in
+        localResourceRoots when creating the webview, otherwise it cannot
+        be loaded.
+
+        Args:
+            local_uri: Local file URI (e.g., 'file:///path/to/file.png')
+                or absolute file path
+
+        Returns:
+            Webview URI that can be used in webview HTML
+
+        Raises:
+            RuntimeError: If the panel has been disposed
+
+        Example:
+            # Convert a local file to webview URI
+            img_uri = panel.as_webview_uri('file:///path/to/image.png')
+
+            # Use in HTML
+            html = f'<img src="{img_uri}">'
+            panel.update_html(html)
+        """
+        if self._disposed:
+            raise RuntimeError("Cannot convert URI for disposed webview panel")
+
+        # Ensure URI is in proper format
+        if not local_uri.startswith("file://"):
+            # Convert absolute path to file URI
+            normalized_path = local_uri.replace("\\", "/")
+            local_uri = f"file://{normalized_path}"
+
+        result = self._client._send_request(
+            "window.asWebviewUri", {"id": self._id, "uri": local_uri}
+        )
+        return result["webviewUri"]
+
     def on_did_receive_message(
         self, handler: Callable[[Any], None]
     ) -> Callable[[], None]:
