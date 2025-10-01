@@ -5,8 +5,9 @@ This example demonstrates how to subscribe to VS Code events
 and react to them in Python.
 """
 
-from vscode_sockpuppet import VSCodeClient
 import time
+
+from vscode_sockpuppet import VSCodeClient
 
 
 def on_file_saved(data):
@@ -27,11 +28,13 @@ def on_file_changed(data):
 
 def on_selection_changed(data):
     """Called when text selection changes."""
-    selections = data['selections']
+    selections = data["selections"]
     if selections:
         sel = selections[0]
-        print(f"Selection changed: Line {sel['start']['line']}, "
-              f"Col {sel['start']['character']}")
+        print(
+            f"Selection changed: Line {sel['start']['line']}, "
+            f"Col {sel['start']['character']}"
+        )
 
 
 def on_terminal_opened(data):
@@ -49,45 +52,44 @@ def on_active_editor_changed(data):
 
 def main():
     """Main example showing event subscriptions."""
-    
+
     with VSCodeClient() as vscode:
         # Show welcome message
         vscode.window.show_information_message(
             "Event subscription example started! "
             "Try opening/saving/editing files."
         )
-        
+
         # Subscribe to various events
         print("Subscribing to events...")
-        
-        vscode.subscribe('workspace.onDidSaveTextDocument', on_file_saved)
-        vscode.subscribe('workspace.onDidOpenTextDocument', on_file_opened)
-        vscode.subscribe('workspace.onDidChangeTextDocument', on_file_changed)
-        vscode.subscribe('window.onDidChangeTextEditorSelection',
-                        on_selection_changed)
-        vscode.subscribe('window.onDidOpenTerminal', on_terminal_opened)
-        vscode.subscribe('window.onDidChangeActiveTextEditor',
-                        on_active_editor_changed)
-        
+
+        vscode.subscribe("workspace.onDidSaveTextDocument", on_file_saved)
+        vscode.subscribe("workspace.onDidOpenTextDocument", on_file_opened)
+        vscode.subscribe("workspace.onDidChangeTextDocument", on_file_changed)
+        vscode.subscribe(
+            "window.onDidChangeTextEditorSelection", on_selection_changed
+        )
+        vscode.subscribe("window.onDidOpenTerminal", on_terminal_opened)
+        vscode.subscribe(
+            "window.onDidChangeActiveTextEditor", on_active_editor_changed
+        )
+
         # Show subscribed events
         subscriptions = vscode.get_subscriptions()
         print(f"Subscribed to {len(subscriptions)} events:")
         for event in subscriptions:
             print(f"  - {event}")
-        
+
         # Create an output channel for logging
         vscode.window.create_output_channel(
             name="Event Monitor",
             text="Monitoring VS Code events...\n",
-            show=True
+            show=True,
         )
-        
+
         # Show status
-        vscode.window.set_status_bar_message(
-            "Event monitoring active",
-            5000
-        )
-        
+        vscode.window.set_status_bar_message("Event monitoring active", 5000)
+
         print("\nListening for events... (Ctrl+C to stop)")
         print("Try:")
         print("  - Opening files")
@@ -95,16 +97,14 @@ def main():
         print("  - Editing text")
         print("  - Changing selection")
         print("  - Opening terminals")
-        
+
         try:
             # Keep the script running to receive events
             while True:
                 time.sleep(0.1)
         except KeyboardInterrupt:
             print("\nStopping event monitoring...")
-            vscode.window.show_information_message(
-                "Event monitoring stopped"
-            )
+            vscode.window.show_information_message("Event monitoring stopped")
 
 
 if __name__ == "__main__":
