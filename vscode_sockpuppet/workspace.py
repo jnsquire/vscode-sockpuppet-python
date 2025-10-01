@@ -5,6 +5,7 @@ Workspace operations for VS Code
 from typing import TYPE_CHECKING, Optional
 
 from .document import TextDocument
+from .events import WorkspaceEvents
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
@@ -15,6 +16,38 @@ class Workspace:
 
     def __init__(self, client: "VSCodeClient"):
         self.client = client
+        self._events = WorkspaceEvents(client)
+
+    # Event subscriptions (VS Code-style API)
+    @property
+    def on_did_open_text_document(self):
+        """Event fired when a text document is opened."""
+        return self._events.on_did_open_text_document
+
+    @property
+    def on_did_close_text_document(self):
+        """Event fired when a text document is closed."""
+        return self._events.on_did_close_text_document
+
+    @property
+    def on_did_save_text_document(self):
+        """Event fired when a text document is saved."""
+        return self._events.on_did_save_text_document
+
+    @property
+    def on_did_change_text_document(self):
+        """Event fired when a text document changes."""
+        return self._events.on_did_change_text_document
+
+    @property
+    def on_did_change_workspace_folders(self):
+        """Event fired when workspace folders are added or removed."""
+        return self._events.on_did_change_workspace_folders
+
+    @property
+    def on_did_change_configuration(self):
+        """Event fired when the configuration changes."""
+        return self._events.on_did_change_configuration
 
     def open_text_document(
         self,

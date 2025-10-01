@@ -5,6 +5,8 @@ Window operations for VS Code
 import uuid
 from typing import TYPE_CHECKING, Optional
 
+from .events import WindowEvents
+
 if TYPE_CHECKING:
     from .client import VSCodeClient
     from .webview import WebviewOptions, WebviewPanel
@@ -15,6 +17,33 @@ class Window:
 
     def __init__(self, client: "VSCodeClient"):
         self.client = client
+        self._events = WindowEvents(client)
+
+    # Event subscriptions (VS Code-style API)
+    @property
+    def on_did_change_active_text_editor(self):
+        """Event fired when the active text editor changes."""
+        return self._events.on_did_change_active_text_editor
+
+    @property
+    def on_did_change_text_editor_selection(self):
+        """Event fired when the selection in an editor changes."""
+        return self._events.on_did_change_text_editor_selection
+
+    @property
+    def on_did_change_visible_text_editors(self):
+        """Event fired when the visible text editors change."""
+        return self._events.on_did_change_visible_text_editors
+
+    @property
+    def on_did_open_terminal(self):
+        """Event fired when a terminal is opened."""
+        return self._events.on_did_open_terminal
+
+    @property
+    def on_did_close_terminal(self):
+        """Event fired when a terminal is closed."""
+        return self._events.on_did_close_terminal
 
     def show_information_message(
         self, message: str, *items: str
