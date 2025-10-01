@@ -10,6 +10,7 @@ from .events import WorkspaceEvents
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
+    from .filewatcher import FileSystemWatcher
 
 
 class Workspace:
@@ -182,3 +183,66 @@ class Workspace:
             value = config.get('editor.fontSize')
         """
         return WorkspaceConfiguration(self.client, section, scope)
+
+    def create_file_system_watcher(
+        self,
+        glob_pattern: str,
+        ignore_create_events: bool = False,
+        ignore_change_events: bool = False,
+        ignore_delete_events: bool = False,
+    ) -> "FileSystemWatcher":
+        """
+        Create a file system watcher for the given glob pattern.
+
+        Args:
+            glob_pattern: Glob pattern to watch (e.g., '**/*.py', '**/*.{js,ts}')
+            ignore_create_events: Don't fire events when files are created
+            ignore_change_events: Don't fire events when files are changed
+            ignore_delete_events: Don't fire events when files are deleted
+
+        Returns:
+            FileSystemWatcher instance
+
+        Example:
+            # Watch all Python files in workspace
+            watcher = workspace.create_file_system_watcher("**/*.py")
+
+            def on_python_file_created(uri):
+                print(f"New Python file: {uri}")
+
+            def on_python_file_changed(uri):
+                print(f"Python file modified: {uri}")
+
+            # Subscribe to events
+            dispose1 = watcher.on_did_create(on_python_file_created)
+            dispose2 = watcher.on_did_change(on_python_file_changed)
+
+            # Later, stop watching
+            watcher.dispose()
+
+            # Or use as context manager
+            with workspace.create_file_system_watcher("**/*.js") as watcher:
+                watcher.on_did_create(lambda uri: print(f"Created: {uri}"))
+                # ... do work ...
+            # Automatically disposed when exiting context
+        """
+        from .filewatcher import FileSystemWatcher
+
+        result = self.client._send_request(
+            "workspace.createFileSystemWatcher",
+            {
+                "globPattern": glob_pattern,
+                "ignoreCreateEvents": ignore_create_events,
+                "ignoreChangeEvents": ignore_change_events,
+                "ignoreDeleteEvents": ignore_delete_events,
+            },
+        )
+
+        return FileSystemWatcher(
+            self.client,
+            result["watcherId"],
+            glob_pattern,
+            ignore_create_events,
+            ignore_change_events,
+            ignore_delete_events,
+        )

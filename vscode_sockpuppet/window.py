@@ -9,6 +9,7 @@ from .events import WindowEvents
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
+    from .tabs import TabGroups
     from .terminal import Terminal
     from .webview import WebviewOptions, WebviewPanel
 
@@ -19,8 +20,17 @@ class Window:
     def __init__(self, client: "VSCodeClient"):
         self.client = client
         self._events = WindowEvents(client)
+        self._tab_groups: Optional[TabGroups] = None
 
     # Event subscriptions (VS Code-style API)
+    @property
+    def tab_groups(self) -> "TabGroups":
+        """Get the tab groups manager."""
+        if self._tab_groups is None:
+            from .tabs import TabGroups
+            self._tab_groups = TabGroups(self.client)
+        return self._tab_groups
+
     @property
     def on_did_change_active_text_editor(self):
         """Event fired when the active text editor changes."""
