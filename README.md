@@ -102,12 +102,12 @@ with VSCodeClient() as vscode:
 ## Documentation
 
 For complete documentation, see:
-- [Quick Start Guide](../docs/QUICKSTART.md)
-- [TextDocument API](../docs/DOCUMENT_API.md)
-- [Webview API](../docs/WEBVIEW_API.md)
-- [Event Subscriptions](../docs/EVENTS.md)
-- [Extension Integration](../docs/EXTENSION_API.md)
-- [Development Guide](../docs/DEVELOPMENT.md)
+- [Quick Start Guide](../docs/getting-started/quickstart.md)
+- [TextDocument API](../docs/api/documents.md)
+- [Webview API](../docs/api/webviews.md)
+- [Event Subscriptions](../docs/api/events.md)
+- [Extension Integration](../docs/guides/extension-integration.md)
+- [Development Guide](../docs/guides/development.md)
 
 ## Examples
 
