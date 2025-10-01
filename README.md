@@ -111,6 +111,7 @@ For complete documentation, see:
 
 ## Examples
 
-- [example.py](example.py) - Basic operations
-- [example_events.py](example_events.py) - Event subscriptions
-- [example_document.py](example_document.py) - TextDocument API
+- [examples/example.py](examples/example.py) - Basic operations
+- [examples/example_events.py](examples/example_events.py) - Event subscriptions
+- [examples/example_document.py](examples/example_document.py) - TextDocument API
+- [examples/example_webview.py](examples/example_webview.py) - Webview API

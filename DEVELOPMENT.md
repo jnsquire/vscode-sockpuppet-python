@@ -127,16 +127,16 @@ Make sure the VS Code extension is running first:
 
 ```bash
 # Basic example
-python example.py
+python examples/example.py
 
 # Document API example
-python example_document.py
+python examples/example_document.py
 
 # Event subscriptions example
-python example_events.py
+python examples/example_events.py
 
 # Webview example
-python example_webview.py
+python examples/example_webview.py
 ```
 
 ## Project Structure
@@ -154,8 +154,12 @@ vscode-sockpuppet-python/
 │   ├── webview.py           # Webview API
 │   ├── window.py            # Window operations
 │   └── workspace.py         # Workspace operations
+├── examples/                # Example scripts
+│   ├── example.py           # Basic operations
+│   ├── example_document.py  # TextDocument API
+│   ├── example_events.py    # Event subscriptions
+│   └── example_webview.py   # Webview API
 ├── tests/                   # Test files (to be added)
-├── example*.py              # Example scripts
 ├── pyproject.toml           # Project configuration
 ├── .python-version          # Python version for uv
 └── README.md               # Package documentation
