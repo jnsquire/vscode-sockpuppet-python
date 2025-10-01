@@ -56,6 +56,31 @@ class Window:
         """Event fired when a terminal is closed."""
         return self._events.on_did_close_terminal
 
+    @property
+    def on_did_change_terminal_state(self):
+        """Event fired when a terminal's state changes."""
+        return self._events.on_did_change_terminal_state
+
+    @property
+    def on_did_change_text_editor_visible_ranges(self):
+        """Event fired when visible ranges in an editor change."""
+        return self._events.on_did_change_text_editor_visible_ranges
+
+    @property
+    def on_did_change_text_editor_options(self):
+        """Event fired when text editor options change."""
+        return self._events.on_did_change_text_editor_options
+
+    @property
+    def on_did_change_text_editor_view_column(self):
+        """Event fired when an editor's view column changes."""
+        return self._events.on_did_change_text_editor_view_column
+
+    @property
+    def on_did_change_window_state(self):
+        """Event fired when the window state changes (focus)."""
+        return self._events.on_did_change_window_state
+
     def show_information_message(
         self, message: str, *items: str
     ) -> Optional[str]:

@@ -236,6 +236,21 @@ class Workspace:
         """Event fired when the configuration changes."""
         return self._events.on_did_change_configuration
 
+    @property
+    def on_did_create_files(self):
+        """Event fired when files are created."""
+        return self._events.on_did_create_files
+
+    @property
+    def on_did_delete_files(self):
+        """Event fired when files are deleted."""
+        return self._events.on_did_delete_files
+
+    @property
+    def on_did_rename_files(self):
+        """Event fired when files are renamed or moved."""
+        return self._events.on_did_rename_files
+
     def open_text_document(
         self,
         uri: Optional[str] = None,

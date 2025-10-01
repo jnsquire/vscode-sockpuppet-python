@@ -141,6 +141,90 @@ class WindowEvents:
         """
         return Event(self._client, "window.onDidCloseTerminal")
 
+    @property
+    def on_did_change_terminal_state(self) -> Event:
+        """
+        Event fired when a terminal's state changes.
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                print(f"Terminal {data['name']}: interacted = {data['isInteractedWith']}")
+
+            dispose = window.on_did_change_terminal_state(handler)
+        """
+        return Event(self._client, "window.onDidChangeTerminalState")
+
+    @property
+    def on_did_change_text_editor_visible_ranges(self) -> Event:
+        """
+        Event fired when visible ranges in an editor change (scrolling).
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                print(f"Visible in {data['uri']}: {len(data['visibleRanges'])} ranges")
+
+            dispose = window.on_did_change_text_editor_visible_ranges(handler)
+        """
+        return Event(self._client, "window.onDidChangeTextEditorVisibleRanges")
+
+    @property
+    def on_did_change_text_editor_options(self) -> Event:
+        """
+        Event fired when text editor options change.
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                opts = data['options']
+                print(f"Tab size: {opts['tabSize']}")
+
+            dispose = window.on_did_change_text_editor_options(handler)
+        """
+        return Event(self._client, "window.onDidChangeTextEditorOptions")
+
+    @property
+    def on_did_change_text_editor_view_column(self) -> Event:
+        """
+        Event fired when an editor's view column changes.
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                print(f"Editor moved to column {data['viewColumn']}")
+
+            dispose = window.on_did_change_text_editor_view_column(handler)
+        """
+        return Event(self._client, "window.onDidChangeTextEditorViewColumn")
+
+    @property
+    def on_did_change_window_state(self) -> Event:
+        """
+        Event fired when the window state changes (focus).
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                if data['focused']:
+                    print("Window gained focus")
+                else:
+                    print("Window lost focus")
+
+            dispose = window.on_did_change_window_state(handler)
+        """
+        return Event(self._client, "window.onDidChangeWindowState")
+
 
 class WorkspaceEvents:
     """
@@ -251,3 +335,54 @@ class WorkspaceEvents:
             dispose = workspace.on_did_change_configuration(handler)
         """
         return Event(self._client, "workspace.onDidChangeConfiguration")
+
+    @property
+    def on_did_create_files(self) -> Event:
+        """
+        Event fired when files are created.
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                for file in data['files']:
+                    print(f"Created: {file['uri']}")
+
+            dispose = workspace.on_did_create_files(handler)
+        """
+        return Event(self._client, "workspace.onDidCreateFiles")
+
+    @property
+    def on_did_delete_files(self) -> Event:
+        """
+        Event fired when files are deleted.
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                for file in data['files']:
+                    print(f"Deleted: {file['uri']}")
+
+            dispose = workspace.on_did_delete_files(handler)
+        """
+        return Event(self._client, "workspace.onDidDeleteFiles")
+
+    @property
+    def on_did_rename_files(self) -> Event:
+        """
+        Event fired when files are renamed or moved.
+
+        Returns:
+            Event that can be called with a handler
+
+        Example:
+            def handler(data):
+                for file in data['files']:
+                    print(f"Renamed: {file['oldUri']} -> {file['newUri']}")
+
+            dispose = workspace.on_did_rename_files(handler)
+        """
+        return Event(self._client, "workspace.onDidRenameFiles")
