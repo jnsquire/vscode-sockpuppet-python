@@ -4,6 +4,33 @@ Python package for programmatically controlling VS Code through the VSCode Sockp
 
 ## Installation
 
+### Using uv (Recommended)
+
+[uv](https://github.com/astral-sh/uv) is a fast Python package installer and resolver.
+
+```bash
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh  # Unix/macOS
+# or
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
+
+# Install the package
+cd python
+uv pip install -e .
+
+# On Windows, also install:
+uv pip install -e ".[windows]"
+
+# Or create a virtual environment with uv
+uv venv
+source .venv/bin/activate  # Unix/macOS
+# or
+.venv\Scripts\activate  # Windows
+uv pip install -e ".[dev]"
+```
+
+### Using pip
+
 ```bash
 cd python
 pip install -e .
