@@ -122,9 +122,8 @@ with VSCodeClient() as client:
     
     print(f"Created webview panel: {panel.id}")
     
-    # Subscribe to webview messages
-    def handle_webview_message(event):
-        message = event['data']['message']
+    # Subscribe to messages from the webview using the panel method
+    def handle_message(message):
         action = message.get('action')
         
         print(f"Received message from webview: {action}")
@@ -146,7 +145,8 @@ with VSCodeClient() as client:
                 'text': f'Hello from Python! Time: {time.strftime("%H:%M:%S")}'
             })
     
-    client.subscribe('webview.onDidReceiveMessage', handle_webview_message)
+    # Subscribe using the panel's method
+    unsubscribe = panel.on_did_receive_message(handle_message)
     
     # Update the webview periodically
     print("Webview is running. Try clicking the buttons!")
