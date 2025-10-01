@@ -4,6 +4,7 @@ Workspace operations for VS Code
 
 from typing import TYPE_CHECKING, Optional
 
+from .configuration import WorkspaceConfiguration
 from .document import TextDocument
 from .events import WorkspaceEvents
 
@@ -154,3 +155,30 @@ class Workspace:
             True if successful
         """
         return self.client._send_request("env.openExternal", {"uri": uri})
+
+    def get_configuration(
+        self, section: Optional[str] = None, scope: Optional[str] = None
+    ) -> WorkspaceConfiguration:
+        """
+        Get a workspace configuration object.
+
+        Args:
+            section: Configuration section (e.g., 'editor', 'python.linting')
+            scope: Resource URI or language ID for scoped configuration
+
+        Returns:
+            WorkspaceConfiguration object
+
+        Example:
+            # Get editor configuration
+            config = client.workspace.get_configuration('editor')
+            font_size = config.get('fontSize', 14)
+
+            # Update a setting
+            config.update('fontSize', 16, ConfigurationTarget.GLOBAL)
+
+            # Get all configuration
+            config = client.workspace.get_configuration()
+            value = config.get('editor.fontSize')
+        """
+        return WorkspaceConfiguration(self.client, section, scope)

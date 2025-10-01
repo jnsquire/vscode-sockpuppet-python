@@ -9,7 +9,9 @@ import tempfile
 import threading
 from typing import Any, Callable, Dict, Optional, Union
 
+from .diagnostics import Languages
 from .editor import Editor
+from .fs import FileSystem
 from .window import Window
 from .workspace import Workspace
 
@@ -52,6 +54,8 @@ class VSCodeClient:
         self.window = Window(self)
         self.workspace = Workspace(self)
         self.editor = Editor(self)
+        self.fs = FileSystem(self)
+        self.languages = Languages(self)
 
     def connect(self) -> None:
         """Connect to the VS Code extension via named pipe/socket."""
