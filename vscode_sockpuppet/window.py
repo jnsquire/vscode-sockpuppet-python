@@ -3,9 +3,11 @@ Window operations for VS Code
 """
 
 from typing import Any, Optional, TYPE_CHECKING
+import uuid
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
+    from .webview import WebviewPanel, WebviewOptions
 
 
 class Window:
@@ -173,3 +175,61 @@ class Window:
             "text": text,
             "hideAfterTimeout": hide_after_timeout
         })
+    
+    def create_webview_panel(
+        self,
+        title: str,
+        html: str,
+        view_type: Optional[str] = None,
+        panel_id: Optional[str] = None,
+        show_options: int = 1,
+        options: Optional['WebviewOptions'] = None
+    ) -> 'WebviewPanel':
+        """
+        Create a webview panel with custom HTML content.
+        
+        Args:
+            title: The title of the webview panel
+            html: The HTML content to display
+            view_type: Identifier for the webview type (auto-generated if None)
+            panel_id: Unique identifier for the panel (auto-generated if None)
+            show_options: ViewColumn where to show (1=One, 2=Two, 3=Three)
+            options: Webview configuration options
+            
+        Returns:
+            The created WebviewPanel instance
+            
+        Example:
+            with window.create_webview_panel(
+                "My Panel",
+                "<h1>Hello from Python!</h1>"
+            ) as panel:
+                # Panel will automatically dispose when exiting context
+                panel.update_html("<h1>Updated content</h1>")
+        """
+        from .webview import WebviewPanel, WebviewOptions
+        
+        if panel_id is None:
+            panel_id = str(uuid.uuid4())
+        
+        if view_type is None:
+            view_type = f"sockpuppet.webview.{panel_id}"
+        
+        params = {
+            "id": panel_id,
+            "viewType": view_type,
+            "title": title,
+            "showOptions": show_options,
+            "html": html
+        }
+        
+        if options:
+            params["options"] = options.to_dict()
+        else:
+            # Default options
+            params["options"] = WebviewOptions().to_dict()
+        
+        self.client._send_request("window.createWebviewPanel", params)
+        
+        return WebviewPanel(self.client, panel_id, view_type, title)
+

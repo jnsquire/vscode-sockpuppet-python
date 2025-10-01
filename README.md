@@ -51,6 +51,7 @@ with VSCodeClient() as vscode:
 - `create_output_channel(name, text, show)` - Create output channel
 - `create_terminal(name, shell_path, text, show)` - Create terminal
 - `set_status_bar_message(text, timeout)` - Set status bar message
+- `create_webview_panel(title, html, options)` - Create custom HTML webview
 
 ### Editor Operations
 - `get_selection()` - Get current selection
@@ -76,6 +77,7 @@ with VSCodeClient() as vscode:
 For complete documentation, see:
 - [Quick Start Guide](../docs/QUICKSTART.md)
 - [TextDocument API](../docs/DOCUMENT_API.md)
+- [Webview API](../docs/WEBVIEW_API.md)
 - [Event Subscriptions](../docs/EVENTS.md)
 - [Extension Integration](../docs/EXTENSION_API.md)
 - [Development Guide](../docs/DEVELOPMENT.md)

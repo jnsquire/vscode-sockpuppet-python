@@ -7,6 +7,7 @@ from .window import Window
 from .workspace import Workspace
 from .editor import Editor
 from .document import TextDocument, Position, Range, TextLine
+from .webview import WebviewPanel, WebviewOptions
 
 __version__ = "0.1.0"
 __all__ = [
@@ -17,5 +18,7 @@ __all__ = [
     "TextDocument",
     "Position",
     "Range",
-    "TextLine"
+    "TextLine",
+    "WebviewPanel",
+    "WebviewOptions"
 ]
