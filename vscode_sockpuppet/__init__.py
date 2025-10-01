@@ -15,7 +15,7 @@ from .diagnostics import (
     create_range,
 )
 from .document import Position, Range, TextDocument, TextLine
-from .editor import Editor
+from .editor import EditBuilder, Editor
 from .fs import FileStat, FileSystem, FileType
 from .progress import Progress, ProgressLocation, with_progress
 from .statusbar import (
@@ -23,6 +23,7 @@ from .statusbar import (
     StatusBarItem,
     create_status_bar_item,
 )
+from .terminal import Terminal
 from .webview import WebviewOptions, WebviewPanel
 from .window import Window
 from .workspace import Workspace
@@ -33,6 +34,7 @@ __all__ = [
     "Window",
     "Workspace",
     "Editor",
+    "EditBuilder",
     "TextDocument",
     "Position",
     "Range",
@@ -53,6 +55,7 @@ __all__ = [
     "StatusBarItem",
     "StatusBarAlignment",
     "create_status_bar_item",
+    "Terminal",
     "Progress",
     "ProgressLocation",
     "with_progress",

@@ -9,6 +9,7 @@ from .events import WindowEvents
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
+    from .terminal import Terminal
     from .webview import WebviewOptions, WebviewPanel
 
 
@@ -177,11 +178,7 @@ class Window:
         name: Optional[str] = None,
         shell_path: Optional[str] = None,
         shell_args: Optional[list] = None,
-        text: Optional[str] = None,
-        show: bool = False,
-        preserve_focus: bool = True,
-        add_new_line: bool = True,
-    ) -> dict:
+    ) -> "Terminal":
         """
         Create a terminal.
 
@@ -189,26 +186,35 @@ class Window:
             name: The name of the terminal
             shell_path: Path to the shell executable
             shell_args: Arguments for the shell
-            text: Optional text to send to the terminal
-            show: Whether to show the terminal
-            preserve_focus: Whether to preserve focus when showing
-            add_new_line: Whether to add a new line after text
 
         Returns:
-            Success status
+            Terminal instance for interacting with the terminal
+
+        Example:
+            # Create a simple terminal
+            terminal = window.create_terminal(name="My Terminal")
+
+            # Create with custom shell
+            terminal = window.create_terminal(
+                name="Bash",
+                shell_path="/bin/bash"
+            )
+
+            # Use the terminal
+            terminal.send_text("echo 'Hello!'")
+            terminal.show()
         """
-        return self.client._send_request(
+        from .terminal import Terminal
+
+        result = self.client._send_request(
             "window.createTerminal",
             {
                 "name": name,
                 "shellPath": shell_path,
                 "shellArgs": shell_args,
-                "text": text,
-                "show": show,
-                "preserveFocus": preserve_focus,
-                "addNewLine": add_new_line,
             },
         )
+        return Terminal(self.client, result["terminalId"], name)
 
     def set_status_bar_message(
         self, text: str, hide_after_timeout: Optional[int] = None
