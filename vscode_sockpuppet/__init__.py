@@ -27,7 +27,7 @@ from .statusbar import (
 from .tabs import Tab, TabGroup, TabGroups
 from .terminal import Terminal
 from .webview import WebviewOptions, WebviewPanel
-from .window import Window
+from .window import OpenDialogOptions, SaveDialogOptions, Window
 from .workspace import Environment, Workspace
 
 __version__ = "0.1.0"
@@ -45,6 +45,8 @@ __all__ = [
     "FileSystemWatcher",
     "WebviewPanel",
     "WebviewOptions",
+    "OpenDialogOptions",
+    "SaveDialogOptions",
     "FileSystem",
     "FileStat",
     "FileType",

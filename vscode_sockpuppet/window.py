@@ -3,7 +3,7 @@ Window operations for VS Code
 """
 
 import uuid
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, TypedDict
 
 from .events import WindowEvents
 
@@ -12,6 +12,66 @@ if TYPE_CHECKING:
     from .tabs import TabGroups
     from .terminal import Terminal
     from .webview import WebviewOptions, WebviewPanel
+
+
+class OpenDialogOptions(TypedDict, total=False):
+    """
+    Options to configure the behavior of a file open dialog.
+
+    Note: On Windows and Linux, a file dialog cannot be both a file selector
+    and a folder selector, so if you set both canSelectFiles and
+    canSelectFolders to True on these platforms, a folder selector will be
+    shown.
+    """
+
+    defaultUri: str
+    """The default URI to show when the dialog opens"""
+
+    openLabel: str
+    """A human-readable string for the open button"""
+
+    canSelectFiles: bool
+    """Allow selecting files (default: True)"""
+
+    canSelectFolders: bool
+    """Allow selecting folders (default: False)"""
+
+    canSelectMany: bool
+    """Allow multiple selections (default: False)"""
+
+    filters: dict[str, list[str]]
+    """
+    File filters used by the dialog. Each entry is a human-readable label
+    and an array of extensions.
+    Example: {'Images': ['png', 'jpg'], 'TypeScript': ['ts', 'tsx']}
+    """
+
+    title: str
+    """Dialog title"""
+
+
+class SaveDialogOptions(TypedDict, total=False):
+    """Options to configure the behavior of a file save dialog."""
+
+    defaultUri: str
+    """The resource the dialog shows when opened"""
+
+    saveLabel: str
+    """A human-readable string for the save button"""
+
+    filters: dict[str, list[str]]
+    """
+    File filters used by the dialog. Each entry is a human-readable label
+    and an array of extensions.
+    Example: {'Images': ['png', 'jpg'], 'TypeScript': ['ts', 'tsx']}
+    """
+
+    title: str
+    """
+    Dialog title.
+    Note: This parameter might be ignored, as not all operating systems
+    display a title on save dialogs (for example, macOS).
+    """
 
 
 class Window:
@@ -161,6 +221,70 @@ class Window:
         return self.client._send_request(
             "window.showInputBox", {"options": options or {}}
         )
+
+    def show_open_dialog(
+        self, options: Optional[OpenDialogOptions] = None
+    ) -> Optional[list[str]]:
+        """
+        Show a file open dialog to the user.
+
+        Args:
+            options: Dialog options (OpenDialogOptions TypedDict)
+
+        Returns:
+            List of selected file/folder URIs, or None if canceled
+
+        Example:
+            # Select a single Python file
+            uris = client.window.show_open_dialog({
+                'canSelectFiles': True,
+                'canSelectFolders': False,
+                'canSelectMany': False,
+                'filters': {'Python': ['py']},
+                'title': 'Select a Python file'
+            })
+
+            # Select multiple files or folders
+            uris = client.window.show_open_dialog({
+                'canSelectFiles': True,
+                'canSelectFolders': True,
+                'canSelectMany': True,
+                'title': 'Select files or folders'
+            })
+        """
+        result = self.client._send_request(
+            "window.showOpenDialog", {"options": options or {}}
+        )
+        return result.get("uris") if result else None
+
+    def show_save_dialog(
+        self, options: Optional[SaveDialogOptions] = None
+    ) -> Optional[str]:
+        """
+        Show a file save dialog to the user.
+
+        Args:
+            options: Dialog options (SaveDialogOptions TypedDict)
+
+        Returns:
+            Selected save location URI, or None if canceled
+
+        Example:
+            # Save a Python file
+            uri = client.window.show_save_dialog({
+                'filters': {'Python': ['py']},
+                'title': 'Save Python file',
+                'saveLabel': 'Save'
+            })
+
+            if uri:
+                # Write to the selected location
+                client.fs.write_text(uri, 'print("Hello")')
+        """
+        result = self.client._send_request(
+            "window.showSaveDialog", {"options": options or {}}
+        )
+        return result.get("uri") if result else None
 
     def show_text_document(
         self, uri: str, options: Optional[dict] = None
