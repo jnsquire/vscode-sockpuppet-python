@@ -3,75 +3,22 @@ Window operations for VS Code
 """
 
 import uuid
-from typing import TYPE_CHECKING, Optional, TypedDict
+from typing import TYPE_CHECKING, Optional
 
 from .events import WindowEvents
+from .window_types import (
+    InputBoxOptions,
+    OpenDialogOptions,
+    QuickPickOptions,
+    SaveDialogOptions,
+    TextDocumentShowOptions,
+)
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
     from .tabs import TabGroups
     from .terminal import Terminal
     from .webview import WebviewOptions, WebviewPanel
-
-
-class OpenDialogOptions(TypedDict, total=False):
-    """
-    Options to configure the behavior of a file open dialog.
-
-    Note: On Windows and Linux, a file dialog cannot be both a file selector
-    and a folder selector, so if you set both canSelectFiles and
-    canSelectFolders to True on these platforms, a folder selector will be
-    shown.
-    """
-
-    defaultUri: str
-    """The default URI to show when the dialog opens"""
-
-    openLabel: str
-    """A human-readable string for the open button"""
-
-    canSelectFiles: bool
-    """Allow selecting files (default: True)"""
-
-    canSelectFolders: bool
-    """Allow selecting folders (default: False)"""
-
-    canSelectMany: bool
-    """Allow multiple selections (default: False)"""
-
-    filters: dict[str, list[str]]
-    """
-    File filters used by the dialog. Each entry is a human-readable label
-    and an array of extensions.
-    Example: {'Images': ['png', 'jpg'], 'TypeScript': ['ts', 'tsx']}
-    """
-
-    title: str
-    """Dialog title"""
-
-
-class SaveDialogOptions(TypedDict, total=False):
-    """Options to configure the behavior of a file save dialog."""
-
-    defaultUri: str
-    """The resource the dialog shows when opened"""
-
-    saveLabel: str
-    """A human-readable string for the save button"""
-
-    filters: dict[str, list[str]]
-    """
-    File filters used by the dialog. Each entry is a human-readable label
-    and an array of extensions.
-    Example: {'Images': ['png', 'jpg'], 'TypeScript': ['ts', 'tsx']}
-    """
-
-    title: str
-    """
-    Dialog title.
-    Note: This parameter might be ignored, as not all operating systems
-    display a title on save dialogs (for example, macOS).
-    """
 
 
 class Window:
@@ -192,14 +139,14 @@ class Window:
         )
 
     def show_quick_pick(
-        self, items: list[str], options: Optional[dict] = None
+        self, items: list[str], options: Optional[QuickPickOptions] = None
     ) -> Optional[str]:
         """
         Show a quick pick menu.
 
         Args:
             items: The items to pick from
-            options: Additional options (placeholder, canPickMany, etc.)
+            options: Quick pick options (QuickPickOptions TypedDict)
 
         Returns:
             The selected item(s) or None if dismissed
@@ -208,12 +155,14 @@ class Window:
             "window.showQuickPick", {"items": items, "options": options or {}}
         )
 
-    def show_input_box(self, options: Optional[dict] = None) -> Optional[str]:
+    def show_input_box(
+        self, options: Optional[InputBoxOptions] = None
+    ) -> Optional[str]:
         """
         Show an input box.
 
         Args:
-            options: Input box options (prompt, placeholder, password, etc.)
+            options: Input box options (InputBoxOptions TypedDict)
 
         Returns:
             The entered text or None if dismissed
@@ -287,14 +236,14 @@ class Window:
         return result.get("uri") if result else None
 
     def show_text_document(
-        self, uri: str, options: Optional[dict] = None
+        self, uri: str, options: Optional[TextDocumentShowOptions] = None
     ) -> dict:
         """
         Show a text document.
 
         Args:
             uri: The URI of the document to show
-            options: View options (viewColumn, preserveFocus, etc.)
+            options: View options (TextDocumentShowOptions TypedDict)
 
         Returns:
             Success status
