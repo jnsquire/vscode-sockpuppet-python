@@ -15,9 +15,7 @@ class WebviewPanel:
     A webview panel displays custom HTML content in a VS Code editor tab.
     """
 
-    def __init__(
-        self, client: "VSCodeClient", panel_id: str, view_type: str, title: str
-    ):
+    def __init__(self, client: "VSCodeClient", panel_id: str, view_type: str, title: str):
         """
         Initialize a WebviewPanel.
 
@@ -68,9 +66,7 @@ class WebviewPanel:
         if self._disposed:
             raise RuntimeError("Cannot update disposed webview panel")
 
-        self._client._send_request(
-            "window.updateWebviewPanel", {"id": self._id, "html": html}
-        )
+        self._client._send_request("window.updateWebviewPanel", {"id": self._id, "html": html})
 
     def update_title(self, title: str) -> None:
         """
@@ -86,9 +82,7 @@ class WebviewPanel:
             raise RuntimeError("Cannot update disposed webview panel")
 
         self._title = title
-        self._client._send_request(
-            "window.updateWebviewPanel", {"id": self._id, "title": title}
-        )
+        self._client._send_request("window.updateWebviewPanel", {"id": self._id, "title": title})
 
     def update_icon(self, icon_path: str) -> None:
         """
@@ -176,9 +170,7 @@ class WebviewPanel:
         )
         return result["webviewUri"]
 
-    def on_did_receive_message(
-        self, handler: Callable[[Any], None]
-    ) -> Callable[[], None]:
+    def on_did_receive_message(self, handler: Callable[[Any], None]) -> Callable[[], None]:
         """
         Subscribe to messages posted from the webview's JavaScript.
 
@@ -245,9 +237,7 @@ class WebviewPanel:
         if self._disposed:
             return
 
-        self._client._send_request(
-            "window.disposeWebviewPanel", {"id": self._id}
-        )
+        self._client._send_request("window.disposeWebviewPanel", {"id": self._id})
         self._disposed = True
 
     def __enter__(self):

@@ -54,13 +54,9 @@ class FileSystem:
             uri: The URI of the file to write
             content: The content to write
         """
-        self.client._send_request(
-            "fs.writeFile", {"uri": uri, "content": list(content)}
-        )
+        self.client._send_request("fs.writeFile", {"uri": uri, "content": list(content)})
 
-    def delete(
-        self, uri: str, recursive: bool = False, use_trash: bool = False
-    ) -> None:
+    def delete(self, uri: str, recursive: bool = False, use_trash: bool = False) -> None:
         """
         Delete a file or directory.
 
@@ -70,13 +66,9 @@ class FileSystem:
             use_trash: Use the OS trash/recycle bin
         """
         options = {"recursive": recursive, "useTrash": use_trash}
-        self.client._send_request(
-            "fs.delete", {"uri": uri, "options": options}
-        )
+        self.client._send_request("fs.delete", {"uri": uri, "options": options})
 
-    def rename(
-        self, source: str, target: str, overwrite: bool = False
-    ) -> None:
+    def rename(self, source: str, target: str, overwrite: bool = False) -> None:
         """
         Rename/move a file or directory.
 

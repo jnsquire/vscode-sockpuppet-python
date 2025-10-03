@@ -37,9 +37,7 @@ class VSCodeClient:
             if os.name == "nt":  # Windows
                 pipe_path = r"\\.\pipe\vscode-sockpuppet"
             else:  # Unix/Linux/Mac
-                pipe_path = os.path.join(
-                    tempfile.gettempdir(), "vscode-sockpuppet.sock"
-                )
+                pipe_path = os.path.join(tempfile.gettempdir(), "vscode-sockpuppet.sock")
 
         self.pipe_path = pipe_path
         self.sock: Optional[Union[socket.socket, Any]] = None
@@ -79,13 +77,11 @@ class VSCodeClient:
                 )
             except ImportError as e:
                 raise ImportError(
-                    "pywin32 is required on Windows. "
-                    "Install with: pip install pywin32"
+                    "pywin32 is required on Windows. Install with: pip install pywin32"
                 ) from e
             except Exception as e:
                 raise ConnectionError(
-                    f"Could not connect to VS Code. "
-                    f"Make sure the extension is running. Error: {e}"
+                    f"Could not connect to VS Code. Make sure the extension is running. Error: {e}"
                 ) from e
         else:  # Unix domain socket
             self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -93,8 +89,7 @@ class VSCodeClient:
                 self.sock.connect(self.pipe_path)
             except Exception as e:
                 raise ConnectionError(
-                    f"Could not connect to VS Code. "
-                    f"Make sure the extension is running. Error: {e}"
+                    f"Could not connect to VS Code. Make sure the extension is running. Error: {e}"
                 ) from e
 
     def disconnect(self) -> None:
@@ -131,9 +126,7 @@ class VSCodeClient:
             RuntimeError: If the request fails
         """
         if not self.is_connected():
-            raise ConnectionError(
-                "Not connected to VS Code. Call connect() first."
-            )
+            raise ConnectionError("Not connected to VS Code. Call connect() first.")
 
         with self._lock:
             self._request_id += 1
@@ -205,9 +198,7 @@ class VSCodeClient:
         Returns:
             List of command identifiers
         """
-        return self._send_request(
-            "commands.getCommands", {"filterInternal": filter_internal}
-        )
+        return self._send_request("commands.getCommands", {"filterInternal": filter_internal})
 
     def subscribe(self, event: str, handler: Callable[[Any], None]) -> None:
         """
@@ -240,14 +231,10 @@ class VSCodeClient:
         # Start event listener thread if not running
         if not self._running and self._event_thread is None:
             self._running = True
-            self._event_thread = threading.Thread(
-                target=self._event_loop, daemon=True
-            )
+            self._event_thread = threading.Thread(target=self._event_loop, daemon=True)
             self._event_thread.start()
 
-    def unsubscribe(
-        self, event: str, handler: Optional[Callable] = None
-    ) -> None:
+    def unsubscribe(self, event: str, handler: Optional[Callable] = None) -> None:
         """
         Unsubscribe from a VS Code event.
 
@@ -311,16 +298,11 @@ class VSCodeClient:
 
                             # Call all handlers for this event
                             if event_name in self._event_handlers:
-                                for handler in self._event_handlers[
-                                    event_name
-                                ]:
+                                for handler in self._event_handlers[event_name]:
                                     try:
                                         handler(event_data)
                                     except Exception as e:
-                                        print(
-                                            f"Error in event handler "
-                                            f"for {event_name}: {e}"
-                                        )
+                                        print(f"Error in event handler for {event_name}: {e}")
 
             except Exception as e:
                 if self._running:

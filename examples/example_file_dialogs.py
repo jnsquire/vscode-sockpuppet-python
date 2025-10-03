@@ -108,11 +108,7 @@ def example_open_with_filters(client: VSCodeClient):
             try:
                 content = client.fs.read_text(uri)
                 lines = content.split("\n")
-                imports = [
-                    line
-                    for line in lines
-                    if line.strip().startswith(("import ", "from "))
-                ]
+                imports = [line for line in lines if line.strip().startswith(("import ", "from "))]
                 print(f"   Lines: {len(lines)}")
                 print(f"   Imports: {len(imports)}")
             except Exception as e:
@@ -148,9 +144,7 @@ def example_select_folder(client: VSCodeClient):
             print(f"\n   Folder contains {len(entries)} items:")
 
             # Separate files and folders
-            files = [
-                name for name, file_type in entries if file_type == 1
-            ]  # FileType.File = 1
+            files = [name for name, file_type in entries if file_type == 1]  # FileType.File = 1
             folders = [
                 name for name, file_type in entries if file_type == 2
             ]  # FileType.Directory = 2
@@ -201,7 +195,7 @@ def example_save_dialog(client: VSCodeClient):
         # Create sample content
         content = f"""'''
 Sample Python file created by VSCode Sockpuppet
-Created at: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Created at: {time.strftime("%Y-%m-%d %H:%M:%S")}
 '''
 
 def hello():
@@ -309,9 +303,7 @@ def example_workflow_select_and_process(client: VSCodeClient):
             "lines": len(lines),
             "chars": len(content),
             "words": len(content.split()),
-            "non_empty_lines": len(
-                [line for line in lines if line.strip()]
-            ),
+            "non_empty_lines": len([line for line in lines if line.strip()]),
         }
 
         print(f"   Lines: {stats['lines']}")
@@ -338,18 +330,18 @@ def example_workflow_select_and_process(client: VSCodeClient):
 
     # Write analysis report
     report = f"""File Analysis Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 Input File: {input_uri}
 
 Statistics:
 -----------
-Total Lines: {stats['lines']}
-Non-empty Lines: {stats['non_empty_lines']}
-Total Characters: {stats['chars']}
-Total Words: {stats['words']}
+Total Lines: {stats["lines"]}
+Non-empty Lines: {stats["non_empty_lines"]}
+Total Characters: {stats["chars"]}
+Total Words: {stats["words"]}
 
-Average Line Length: {stats['chars'] / max(stats['lines'], 1):.1f} chars
-Average Word Length: {stats['chars'] / max(stats['words'], 1):.1f} chars
+Average Line Length: {stats["chars"] / max(stats["lines"], 1):.1f} chars
+Average Word Length: {stats["chars"] / max(stats["words"], 1):.1f} chars
 """
 
     try:

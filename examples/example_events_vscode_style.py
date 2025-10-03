@@ -68,9 +68,7 @@ def main():
                     text = text[:50] + "..."
                 print(f"   Change {i}: {repr(text)}")
 
-        dispose7 = client.workspace.on_did_change_text_document(
-            on_document_change
-        )
+        dispose7 = client.workspace.on_did_change_text_document(on_document_change)
         disposables.append(dispose7)
 
         dispose8 = client.workspace.on_did_change_configuration(

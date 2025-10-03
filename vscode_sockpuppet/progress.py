@@ -35,9 +35,7 @@ class Progress:
         self.client = client
         self.progress_id = progress_id
 
-    def report(
-        self, message: Optional[str] = None, increment: Optional[int] = None
-    ) -> None:
+    def report(self, message: Optional[str] = None, increment: Optional[int] = None) -> None:
         """
         Report progress.
 

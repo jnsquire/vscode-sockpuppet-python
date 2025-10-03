@@ -53,7 +53,7 @@ disallow_untyped_defs = true
 strict = true
 
 [tool.ruff]
-line-length = 79
+line-length = 99
 target-version = "py38"
 
 [tool.ruff.lint]

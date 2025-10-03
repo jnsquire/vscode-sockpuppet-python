@@ -61,10 +61,7 @@ def main():
         print(f"Default Value: {font_info.get('defaultValue')}")
         print(f"Global Value: {font_info.get('globalValue')}")
         print(f"Workspace Value: {font_info.get('workspaceValue')}")
-        print(
-            f"Workspace Folder Value: "
-            f"{font_info.get('workspaceFolderValue')}"
-        )
+        print(f"Workspace Folder Value: {font_info.get('workspaceFolderValue')}")
 
     # Example 4: Update configuration (User Settings)
     print("\n4. Updating Configuration (User Settings)")
@@ -75,11 +72,7 @@ def main():
 
     # Update colorTheme in user settings
     print("Setting color theme to 'Default Dark+'...")
-    test_config.update(
-        "colorTheme",
-        "Default Dark+",
-        ConfigurationTarget.GLOBAL
-    )
+    test_config.update("colorTheme", "Default Dark+", ConfigurationTarget.GLOBAL)
     print("User setting updated!")
 
     # Verify the change
@@ -101,11 +94,7 @@ def main():
         # Update workspace tab size
         new_tab_size = 2
         print(f"Updating workspace tab size to {new_tab_size}...")
-        editor_config.update(
-            "tabSize",
-            new_tab_size,
-            ConfigurationTarget.WORKSPACE
-        )
+        editor_config.update("tabSize", new_tab_size, ConfigurationTarget.WORKSPACE)
         print("Workspace setting updated!")
 
         # Verify
@@ -114,11 +103,7 @@ def main():
 
         # Restore original value
         print(f"Restoring original tab size ({current_tab_size})...")
-        editor_config.update(
-            "tabSize",
-            current_tab_size,
-            ConfigurationTarget.WORKSPACE
-        )
+        editor_config.update("tabSize", current_tab_size, ConfigurationTarget.WORKSPACE)
         print("Original value restored!")
 
     except Exception as e:
@@ -132,22 +117,14 @@ def main():
     # Set a custom setting first
     custom_config = client.workspace.get_configuration("myExtension")
     print("Setting custom value...")
-    custom_config.update(
-        "customSetting",
-        "test value",
-        ConfigurationTarget.GLOBAL
-    )
+    custom_config.update("customSetting", "test value", ConfigurationTarget.GLOBAL)
 
     value = custom_config.get("customSetting")
     print(f"Custom setting value: {value}")
 
     # Remove the setting
     print("Removing custom setting...")
-    custom_config.update(
-        "customSetting",
-        None,
-        ConfigurationTarget.GLOBAL
-    )
+    custom_config.update("customSetting", None, ConfigurationTarget.GLOBAL)
 
     value_after = custom_config.get("customSetting")
     print(f"Custom setting after removal: {value_after}")

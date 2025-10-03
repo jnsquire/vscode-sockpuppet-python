@@ -31,10 +31,7 @@ def on_selection_changed(data):
     selections = data["selections"]
     if selections:
         sel = selections[0]
-        print(
-            f"Selection changed: Line {sel['start']['line']}, "
-            f"Col {sel['start']['character']}"
-        )
+        print(f"Selection changed: Line {sel['start']['line']}, Col {sel['start']['character']}")
 
 
 def on_terminal_opened(data):
@@ -56,8 +53,7 @@ def main():
     with VSCodeClient() as vscode:
         # Show welcome message
         vscode.window.show_information_message(
-            "Event subscription example started! "
-            "Try opening/saving/editing files."
+            "Event subscription example started! Try opening/saving/editing files."
         )
 
         # Subscribe to various events
@@ -66,13 +62,9 @@ def main():
         vscode.subscribe("workspace.onDidSaveTextDocument", on_file_saved)
         vscode.subscribe("workspace.onDidOpenTextDocument", on_file_opened)
         vscode.subscribe("workspace.onDidChangeTextDocument", on_file_changed)
-        vscode.subscribe(
-            "window.onDidChangeTextEditorSelection", on_selection_changed
-        )
+        vscode.subscribe("window.onDidChangeTextEditorSelection", on_selection_changed)
         vscode.subscribe("window.onDidOpenTerminal", on_terminal_opened)
-        vscode.subscribe(
-            "window.onDidChangeActiveTextEditor", on_active_editor_changed
-        )
+        vscode.subscribe("window.onDidChangeActiveTextEditor", on_active_editor_changed)
 
         # Show subscribed events
         subscriptions = vscode.get_subscriptions()

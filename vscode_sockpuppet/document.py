@@ -50,10 +50,7 @@ class Range:
     @property
     def is_empty(self) -> bool:
         """Check if this range is empty (start == end)."""
-        return (
-            self.start.line == self.end.line
-            and self.start.character == self.end.character
-        )
+        return self.start.line == self.end.line and self.start.character == self.end.character
 
     @property
     def is_single_line(self) -> bool:
@@ -76,9 +73,7 @@ class TextLine:
         self.line_number = line_number
         self.text = text
         self.is_empty_or_whitespace = is_empty_or_whitespace
-        self.first_non_whitespace_character_index = (
-            first_non_whitespace_char_index
-        )
+        self.first_non_whitespace_character_index = first_non_whitespace_char_index
         self.range = range_obj
         self.range_including_line_break = range_including_line_break
 
@@ -92,13 +87,9 @@ class TextLine:
             line_number=data["lineNumber"],
             text=data["text"],
             is_empty_or_whitespace=data["isEmptyOrWhitespace"],
-            first_non_whitespace_char_index=data[
-                "firstNonWhitespaceCharacterIndex"
-            ],
+            first_non_whitespace_char_index=data["firstNonWhitespaceCharacterIndex"],
             range_obj=Range.from_dict(data["range"]),
-            range_including_line_break=Range.from_dict(
-                data["rangeIncludingLineBreak"]
-            ),
+            range_including_line_break=Range.from_dict(data["rangeIncludingLineBreak"]),
         )
 
 
@@ -172,9 +163,7 @@ class TextDocument:
         Returns:
             True if saved successfully
         """
-        result = self._client._send_request(
-            "document.save", {"uri": self._uri}
-        )
+        result = self._client._send_request("document.save", {"uri": self._uri})
         if result.get("success"):
             self._is_dirty = False
             self._version = result.get("version", self._version)
@@ -263,9 +252,7 @@ class TextDocument:
         if regex:
             params["regex"] = regex
 
-        result = self._client._send_request(
-            "document.getWordRangeAtPosition", params
-        )
+        result = self._client._send_request("document.getWordRangeAtPosition", params)
         return Range.from_dict(result) if result else None
 
     def validate_range(self, range: Range) -> Range:

@@ -20,9 +20,7 @@ class DiagnosticSeverity:
 class DiagnosticRelatedInformation:
     """Related information for a diagnostic."""
 
-    def __init__(
-        self, location: dict, message: str
-    ):
+    def __init__(self, location: dict, message: str):
         """
         Create diagnostic related information.
 
@@ -69,9 +67,7 @@ class Diagnostic:
         self.code = code
         self.related_information: List[DiagnosticRelatedInformation] = []
 
-    def add_related_information(
-        self, location: dict, message: str
-    ) -> "Diagnostic":
+    def add_related_information(self, location: dict, message: str) -> "Diagnostic":
         """
         Add related information to this diagnostic.
 
@@ -82,9 +78,7 @@ class Diagnostic:
         Returns:
             Self for chaining
         """
-        self.related_information.append(
-            DiagnosticRelatedInformation(location, message)
-        )
+        self.related_information.append(DiagnosticRelatedInformation(location, message))
         return self
 
     def to_dict(self) -> dict:
@@ -99,9 +93,7 @@ class Diagnostic:
         if self.code is not None:
             result["code"] = self.code
         if self.related_information:
-            result["relatedInformation"] = [
-                info.to_dict() for info in self.related_information
-            ]
+            result["relatedInformation"] = [info.to_dict() for info in self.related_information]
         return result
 
 
@@ -119,9 +111,7 @@ class DiagnosticCollection:
         self.client = client
         self.name = name
 
-    def set(
-        self, uri: str, diagnostics: Optional[List[Diagnostic]] = None
-    ) -> None:
+    def set(self, uri: str, diagnostics: Optional[List[Diagnostic]] = None) -> None:
         """
         Set diagnostics for a URI.
 
@@ -129,9 +119,7 @@ class DiagnosticCollection:
             uri: The URI to set diagnostics for
             diagnostics: List of diagnostics (None or [] clears)
         """
-        diag_list = (
-            [d.to_dict() for d in diagnostics] if diagnostics else []
-        )
+        diag_list = [d.to_dict() for d in diagnostics] if diagnostics else []
         self.client._send_request(
             "languages.setDiagnostics",
             {"name": self.name, "uri": uri, "diagnostics": diag_list},
@@ -144,21 +132,15 @@ class DiagnosticCollection:
         Args:
             uri: The URI to clear diagnostics for
         """
-        self.client._send_request(
-            "languages.clearDiagnostics", {"name": self.name, "uri": uri}
-        )
+        self.client._send_request("languages.clearDiagnostics", {"name": self.name, "uri": uri})
 
     def clear(self) -> None:
         """Clear all diagnostics in this collection."""
-        self.client._send_request(
-            "languages.clearDiagnostics", {"name": self.name}
-        )
+        self.client._send_request("languages.clearDiagnostics", {"name": self.name})
 
     def dispose(self) -> None:
         """Dispose this diagnostic collection."""
-        self.client._send_request(
-            "languages.disposeDiagnosticCollection", {"name": self.name}
-        )
+        self.client._send_request("languages.disposeDiagnosticCollection", {"name": self.name})
 
 
 class Languages:
@@ -168,9 +150,7 @@ class Languages:
         self.client = client
         self._collections: dict[str, DiagnosticCollection] = {}
 
-    def create_diagnostic_collection(
-        self, name: str = "default"
-    ) -> DiagnosticCollection:
+    def create_diagnostic_collection(self, name: str = "default") -> DiagnosticCollection:
         """
         Create a diagnostic collection.
 
@@ -183,18 +163,14 @@ class Languages:
         if name in self._collections:
             return self._collections[name]
 
-        self.client._send_request(
-            "languages.createDiagnosticCollection", {"name": name}
-        )
+        self.client._send_request("languages.createDiagnosticCollection", {"name": name})
         collection = DiagnosticCollection(self.client, name)
         self._collections[name] = collection
         return collection
 
 
 # Helper functions for creating ranges and positions
-def create_range(
-    start_line: int, start_char: int, end_line: int, end_char: int
-) -> dict:
+def create_range(start_line: int, start_char: int, end_line: int, end_char: int) -> dict:
     """
     Create a range object.
 

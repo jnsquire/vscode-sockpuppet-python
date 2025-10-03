@@ -81,23 +81,15 @@ def multiple_watchers_example(client: VSCodeClient):
 
     # Watch Python files
     python_watcher = client.workspace.create_file_system_watcher("**/*.py")
-    python_watcher.on_did_create(
-        lambda uri: print(f"🐍 New Python file: {uri}")
-    )
+    python_watcher.on_did_create(lambda uri: print(f"🐍 New Python file: {uri}"))
 
     # Watch JavaScript/TypeScript files
-    js_watcher = client.workspace.create_file_system_watcher(
-        "**/*.{js,ts}"
-    )
-    js_watcher.on_did_create(
-        lambda uri: print(f"📜 New JS/TS file: {uri}")
-    )
+    js_watcher = client.workspace.create_file_system_watcher("**/*.{js,ts}")
+    js_watcher.on_did_create(lambda uri: print(f"📜 New JS/TS file: {uri}"))
 
     # Watch JSON files
     json_watcher = client.workspace.create_file_system_watcher("**/*.json")
-    json_watcher.on_did_change(
-        lambda uri: print(f"📋 JSON file changed: {uri}")
-    )
+    json_watcher.on_did_change(lambda uri: print(f"📋 JSON file changed: {uri}"))
 
     print("Watching multiple file types simultaneously...")
     print("- Python files (.py)")
@@ -119,12 +111,8 @@ def context_manager_example(client: VSCodeClient):
 
     # Automatically disposes when exiting context
     with client.workspace.create_file_system_watcher("**/*.md") as watcher:
-        watcher.on_did_create(
-            lambda uri: print(f"📄 New Markdown file: {uri}")
-        )
-        watcher.on_did_change(
-            lambda uri: print(f"✏️  Markdown file edited: {uri}")
-        )
+        watcher.on_did_create(lambda uri: print(f"📄 New Markdown file: {uri}"))
+        watcher.on_did_change(lambda uri: print(f"✏️  Markdown file edited: {uri}"))
 
         print("Watching Markdown files...")
         print("Watcher will auto-dispose when done\n")

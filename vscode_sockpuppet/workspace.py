@@ -317,9 +317,7 @@ class Workspace:
         Returns:
             TextDocument object
         """
-        data = self.client._send_request(
-            "workspace.getTextDocument", {"uri": uri}
-        )
+        data = self.client._send_request("workspace.getTextDocument", {"uri": uri})
         return TextDocument(self.client, data)
 
     def find_files(
@@ -382,14 +380,10 @@ class Workspace:
             if folder:
                 print(f"File is in workspace: {folder['name']}")
         """
-        result = self.client._send_request(
-            "workspace.getWorkspaceFolder", {"uri": uri}
-        )
+        result = self.client._send_request("workspace.getWorkspaceFolder", {"uri": uri})
         return result["folder"]
 
-    def as_relative_path(
-        self, path_or_uri: str, include_workspace_folder: bool = False
-    ) -> str:
+    def as_relative_path(self, path_or_uri: str, include_workspace_folder: bool = False) -> str:
         """
         Convert a path or URI to a workspace-relative path.
 

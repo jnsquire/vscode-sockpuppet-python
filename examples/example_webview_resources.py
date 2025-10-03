@@ -156,7 +156,7 @@ html = f'&lt;link rel="stylesheet" href="{{css_uri}}"&gt;'
             </ul>
 
             <p style="margin-top: 30px; color: var(--vscode-descriptionForeground);">
-                <em>Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S')}</em>
+                <em>Timestamp: {time.strftime("%Y-%m-%d %H:%M:%S")}</em>
             </p>
         </div>
     </body>

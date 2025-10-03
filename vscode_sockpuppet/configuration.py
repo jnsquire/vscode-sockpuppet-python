@@ -124,9 +124,7 @@ class WorkspaceConfiguration:
         self,
         key: str,
         value: Any,
-        configuration_target: Optional[
-            ConfigurationTarget | bool | None
-        ] = None,
+        configuration_target: Optional[ConfigurationTarget | bool | None] = None,
         override_in_language: bool = False,
     ) -> None:
         """

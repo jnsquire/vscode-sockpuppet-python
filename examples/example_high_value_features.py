@@ -67,9 +67,7 @@ def demonstrate_diagnostics(client: VSCodeClient):
     print("\n=== Diagnostics API ===")
 
     # Create a diagnostic collection
-    collection = client.languages.create_diagnostic_collection(
-        "example-linter"
-    )
+    collection = client.languages.create_diagnostic_collection("example-linter")
     print("✓ Created diagnostic collection")
 
     # Open or create a test document
@@ -123,9 +121,7 @@ def demonstrate_status_bar(client: VSCodeClient):
     print("\n=== Status Bar Items ===")
 
     # Create a status bar item
-    status_item = create_status_bar_item(
-        client, alignment=StatusBarAlignment.Left, priority=100
-    )
+    status_item = create_status_bar_item(client, alignment=StatusBarAlignment.Left, priority=100)
     print("✓ Created status bar item")
 
     # Set properties
@@ -164,17 +160,13 @@ def demonstrate_commands(client: VSCodeClient):
     print("\n=== Command Execution ===")
 
     # Get list of available commands
-    commands = client._send_request(
-        "commands.getCommands", {"filterInternal": True}
-    )
+    commands = client._send_request("commands.getCommands", {"filterInternal": True})
     print(f"✓ Found {len(commands)} commands")
     print(f"  Examples: {commands[:5]}")
 
     # Execute a command (open settings)
     print("✓ Executing command: workbench.action.openSettings")
-    client._send_request(
-        "commands.executeCommand", {"command": "workbench.action.openSettings"}
-    )
+    client._send_request("commands.executeCommand", {"command": "workbench.action.openSettings"})
 
 
 def main():

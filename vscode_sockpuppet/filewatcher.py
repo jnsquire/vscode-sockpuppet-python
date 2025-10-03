@@ -110,10 +110,7 @@ class FileSystemWatcher:
             dispose()
         """
         if self.ignore_create_events:
-            raise ValueError(
-                "Cannot register onCreate handler when "
-                "ignoreCreateEvents is True"
-            )
+            raise ValueError("Cannot register onCreate handler when ignoreCreateEvents is True")
 
         self._on_create_handlers.append(handler)
 
@@ -141,10 +138,7 @@ class FileSystemWatcher:
             dispose = watcher.on_did_change(on_file_changed)
         """
         if self.ignore_change_events:
-            raise ValueError(
-                "Cannot register onChange handler when "
-                "ignoreChangeEvents is True"
-            )
+            raise ValueError("Cannot register onChange handler when ignoreChangeEvents is True")
 
         self._on_change_handlers.append(handler)
 
@@ -172,10 +166,7 @@ class FileSystemWatcher:
             dispose = watcher.on_did_delete(on_file_deleted)
         """
         if self.ignore_delete_events:
-            raise ValueError(
-                "Cannot register onDelete handler when "
-                "ignoreDeleteEvents is True"
-            )
+            raise ValueError("Cannot register onDelete handler when ignoreDeleteEvents is True")
 
         self._on_delete_handlers.append(handler)
 
@@ -212,10 +203,7 @@ class FileSystemWatcher:
 
     def __repr__(self) -> str:
         """String representation of the watcher."""
-        return (
-            f"FileSystemWatcher(id={self.watcher_id!r}, "
-            f"pattern={self.glob_pattern!r})"
-        )
+        return f"FileSystemWatcher(id={self.watcher_id!r}, pattern={self.glob_pattern!r})"
 
     def __enter__(self):
         """Context manager entry."""

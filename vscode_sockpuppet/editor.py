@@ -74,9 +74,7 @@ class Editor:
             },
         )
 
-    def delete_range(
-        self, start_line: int, start_char: int, end_line: int, end_char: int
-    ) -> dict:
+    def delete_range(self, start_line: int, start_char: int, end_line: int, end_char: int) -> dict:
         """
         Delete text in a range.
 
@@ -283,9 +281,7 @@ class Editor:
             for sel in selections:
                 print(f"Selected: {sel['text']}")
         """
-        return self.client._send_request(
-            "window.activeTextEditor.selections"
-        )
+        return self.client._send_request("window.activeTextEditor.selections")
 
     def set_selections(self, selections: list[dict]) -> dict:
         """
@@ -327,9 +323,7 @@ class Editor:
             print(f"Tab size: {options['tabSize']}")
             print(f"Insert spaces: {options['insertSpaces']}")
         """
-        return self.client._send_request(
-            "window.activeTextEditor.options"
-        )
+        return self.client._send_request("window.activeTextEditor.options")
 
     def set_options(self, options: dict) -> dict:
         """
@@ -365,9 +359,7 @@ class Editor:
                 print(f"Visible: lines {r['start']['line']}-"
                       f"{r['end']['line']}")
         """
-        return self.client._send_request(
-            "window.activeTextEditor.visibleRanges"
-        )
+        return self.client._send_request("window.activeTextEditor.visibleRanges")
 
     def get_view_column(self) -> Optional[int]:
         """
@@ -380,9 +372,7 @@ class Editor:
             column = editor.get_view_column()
             print(f"Editor in column: {column}")
         """
-        return self.client._send_request(
-            "window.activeTextEditor.viewColumn"
-        )
+        return self.client._send_request("window.activeTextEditor.viewColumn")
 
 
 class EditBuilder:
@@ -420,8 +410,7 @@ class EditBuilder:
         return self
 
     def delete(
-        self, start_line: int, start_char: int,
-        end_line: int, end_char: int
+        self, start_line: int, start_char: int, end_line: int, end_char: int
     ) -> "EditBuilder":
         """
         Add a delete operation.
@@ -478,4 +467,3 @@ class EditBuilder:
             }
         )
         return self
-

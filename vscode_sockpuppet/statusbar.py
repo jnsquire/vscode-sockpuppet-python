@@ -117,9 +117,7 @@ class StatusBarItem:
 
     def dispose(self) -> None:
         """Dispose the status bar item."""
-        self.client._send_request(
-            "window.disposeStatusBarItem", {"id": self.id}
-        )
+        self.client._send_request("window.disposeStatusBarItem", {"id": self.id})
 
     def _update(self) -> None:
         """Update the status bar item on the server."""

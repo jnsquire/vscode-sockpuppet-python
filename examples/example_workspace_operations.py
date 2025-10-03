@@ -27,9 +27,7 @@ def example_find_files(client: VSCodeClient):
 
     # Find specific file type with exclusions
     print("\n2. Finding Markdown files, excluding node_modules:")
-    md_files = client.workspace.find_files(
-        "**/*.md", "**/node_modules/**"
-    )
+    md_files = client.workspace.find_files("**/*.md", "**/node_modules/**")
     print(f"   Found {len(md_files)} Markdown files")
     for uri in md_files[:3]:
         print(f"   - {uri}")
@@ -99,9 +97,7 @@ def example_relative_paths(client: VSCodeClient):
 
     print("\n2. With workspace folder name (multi-folder workspaces):")
     for uri in files[:2]:
-        rel_path = client.workspace.as_relative_path(
-            uri, include_workspace_folder=True
-        )
+        rel_path = client.workspace.as_relative_path(uri, include_workspace_folder=True)
         print(f"\n   Original: {uri}")
         print(f"   Relative: {rel_path}")
 
@@ -196,9 +192,7 @@ def example_workspace_statistics(client: VSCodeClient):
     # Display statistics
     print("\n   File Type Distribution:")
     total = sum(stats.values())
-    for name, count in sorted(
-        stats.items(), key=lambda x: x[1], reverse=True
-    ):
+    for name, count in sorted(stats.items(), key=lambda x: x[1], reverse=True):
         if count > 0:
             percentage = (count / total * 100) if total > 0 else 0
             print(f"   {name:15} {count:5} files ({percentage:5.1f}%)")

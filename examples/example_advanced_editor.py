@@ -35,11 +35,7 @@ def demonstrate_atomic_edits(client: VSCodeClient):
         # Delete a line at line 15
         builder.delete(15, 0, 16, 0)
 
-    editor.edit(
-        apply_edits,
-        undo_stop_before=True,
-        undo_stop_after=True
-    )
+    editor.edit(apply_edits, undo_stop_before=True, undo_stop_after=True)
     print("Applied multiple edits atomically")
 
 
@@ -90,10 +86,7 @@ def demonstrate_scroll_control(client: VSCodeClient):
     print("Scrolled to line 100 (at top)")
 
     # Scroll to a range only if it's outside the viewport
-    editor.reveal_range(
-        150, 0, 160, 0,
-        reveal_type="InCenterIfOutsideViewport"
-    )
+    editor.reveal_range(150, 0, 160, 0, reveal_type="InCenterIfOutsideViewport")
     print("Scrolled to lines 150-160 (if needed)")
 
 
@@ -109,24 +102,17 @@ def demonstrate_multiple_selections(client: VSCodeClient):
     selections = editor.get_selections()
     print(f"Current selections: {len(selections)}")
     for i, sel in enumerate(selections):
-        print(f"  Selection {i+1}: {sel}")
+        print(f"  Selection {i + 1}: {sel}")
 
     # Set multiple selections at specific locations
     # This creates three cursors
-    editor.set_selections([
-        {
-            'anchor': {'line': 10, 'character': 0},
-            'active': {'line': 10, 'character': 0}
-        },
-        {
-            'anchor': {'line': 20, 'character': 0},
-            'active': {'line': 20, 'character': 0}
-        },
-        {
-            'anchor': {'line': 30, 'character': 0},
-            'active': {'line': 30, 'character': 0}
-        }
-    ])
+    editor.set_selections(
+        [
+            {"anchor": {"line": 10, "character": 0}, "active": {"line": 10, "character": 0}},
+            {"anchor": {"line": 20, "character": 0}, "active": {"line": 20, "character": 0}},
+            {"anchor": {"line": 30, "character": 0}, "active": {"line": 30, "character": 0}},
+        ]
+    )
     print("Set three cursors at lines 10, 20, and 30")
 
     # Now any edit will apply to all three locations
@@ -151,10 +137,7 @@ def demonstrate_editor_options(client: VSCodeClient):
     print(f"  Line numbers: {options.get('lineNumbers')}")
 
     # Modify options (e.g., switch to tabs instead of spaces)
-    editor.set_options({
-        'insertSpaces': False,
-        'tabSize': 4
-    })
+    editor.set_options({"insertSpaces": False, "tabSize": 4})
     print("\nChanged to tabs (size 4)")
 
     # Verify the change
@@ -174,9 +157,9 @@ def demonstrate_viewport_queries(client: VSCodeClient):
     visible_ranges = editor.get_visible_ranges()
     print(f"Visible ranges: {len(visible_ranges)}")
     for i, range_data in enumerate(visible_ranges):
-        start = range_data['start']
-        end = range_data['end']
-        print(f"  Range {i+1}: lines {start['line']}-{end['line']}")
+        start = range_data["start"]
+        end = range_data["end"]
+        print(f"  Range {i + 1}: lines {start['line']}-{end['line']}")
 
     # Get view column (which column group the editor is in)
     view_column = editor.get_view_column()
@@ -202,10 +185,12 @@ def demonstrate_practical_use_case(client: VSCodeClient):
     # 2. Set multiple selections at those positions
     selections = []
     for start_line, start_char, end_line, end_char in occurrences:
-        selections.append({
-            'anchor': {'line': start_line, 'character': start_char},
-            'active': {'line': end_line, 'character': end_char}
-        })
+        selections.append(
+            {
+                "anchor": {"line": start_line, "character": start_char},
+                "active": {"line": end_line, "character": end_char},
+            }
+        )
 
     editor.set_selections(selections)
     print(f"Found {len(occurrences)} occurrences to refactor")
@@ -218,9 +203,11 @@ def demonstrate_practical_use_case(client: VSCodeClient):
     # 4. Scroll to the first occurrence to review
     first_occurrence = occurrences[0]
     editor.reveal_range(
-        first_occurrence[0], first_occurrence[1],
-        first_occurrence[2], first_occurrence[3],
-        reveal_type="InCenter"
+        first_occurrence[0],
+        first_occurrence[1],
+        first_occurrence[2],
+        first_occurrence[3],
+        reveal_type="InCenter",
     )
     print("Scrolled to first occurrence for review")
 
@@ -233,6 +220,7 @@ def main():
 
         # Wait for connection
         import time
+
         time.sleep(1)
 
         # Run demonstrations

@@ -29,19 +29,15 @@ def example_window_events():
             else:
                 print("✏️  No active editor")
 
-        dispose1 = client.window.on_did_change_active_text_editor(
-            on_active_editor
-        )
+        dispose1 = client.window.on_did_change_active_text_editor(on_active_editor)
 
         # Editor selection changes
         def on_selection(data):
             sel = data["selections"][0]
             start = sel["start"]
-            print(f"📍 Selection: Line {start['line']+1}, Col {start['character']+1}")
+            print(f"📍 Selection: Line {start['line'] + 1}, Col {start['character'] + 1}")
 
-        dispose2 = client.window.on_did_change_text_editor_selection(
-            on_selection
-        )
+        dispose2 = client.window.on_did_change_text_editor_selection(on_selection)
 
         # Visible ranges (scrolling)
         def on_visible_ranges(data):
@@ -49,29 +45,22 @@ def example_window_events():
             if ranges:
                 start_line = ranges[0]["start"]["line"]
                 end_line = ranges[-1]["end"]["line"]
-                print(f"👁️  Visible: Lines {start_line+1}-{end_line+1}")
+                print(f"👁️  Visible: Lines {start_line + 1}-{end_line + 1}")
 
-        dispose3 = client.window.on_did_change_text_editor_visible_ranges(
-            on_visible_ranges
-        )
+        dispose3 = client.window.on_did_change_text_editor_visible_ranges(on_visible_ranges)
 
         # Editor options changes
         def on_options(data):
             opts = data["options"]
-            print(f"⚙️  Options: Tab size={opts['tabSize']}, "
-                  f"Insert spaces={opts['insertSpaces']}")
+            print(f"⚙️  Options: Tab size={opts['tabSize']}, Insert spaces={opts['insertSpaces']}")
 
-        dispose4 = client.window.on_did_change_text_editor_options(
-            on_options
-        )
+        dispose4 = client.window.on_did_change_text_editor_options(on_options)
 
         # View column changes
         def on_view_column(data):
             print(f"🔀 Editor moved to column {data['viewColumn']}")
 
-        dispose5 = client.window.on_did_change_text_editor_view_column(
-            on_view_column
-        )
+        dispose5 = client.window.on_did_change_text_editor_view_column(on_view_column)
 
         # Window focus changes
         def on_window_state(data):
@@ -264,52 +253,26 @@ def example_comprehensive_monitoring():
             return handler
 
         disposables.append(
-            client.window.on_did_change_active_text_editor(
-                count_event("editor_changes")
-            )
+            client.window.on_did_change_active_text_editor(count_event("editor_changes"))
         )
         disposables.append(
-            client.window.on_did_change_text_editor_selection(
-                count_event("selections")
-            )
+            client.window.on_did_change_text_editor_selection(count_event("selections"))
         )
         disposables.append(
-            client.window.on_did_change_text_editor_visible_ranges(
-                count_event("scrolls")
-            )
+            client.window.on_did_change_text_editor_visible_ranges(count_event("scrolls"))
         )
-        disposables.append(
-            client.window.on_did_open_terminal(count_event("terminal_ops"))
-        )
-        disposables.append(
-            client.window.on_did_close_terminal(count_event("terminal_ops"))
-        )
+        disposables.append(client.window.on_did_open_terminal(count_event("terminal_ops")))
+        disposables.append(client.window.on_did_close_terminal(count_event("terminal_ops")))
 
         # Workspace events
+        disposables.append(client.workspace.on_did_open_text_document(count_event("file_ops")))
+        disposables.append(client.workspace.on_did_close_text_document(count_event("file_ops")))
         disposables.append(
-            client.workspace.on_did_open_text_document(
-                count_event("file_ops")
-            )
+            client.workspace.on_did_change_text_document(count_event("doc_changes"))
         )
-        disposables.append(
-            client.workspace.on_did_close_text_document(
-                count_event("file_ops")
-            )
-        )
-        disposables.append(
-            client.workspace.on_did_change_text_document(
-                count_event("doc_changes")
-            )
-        )
-        disposables.append(
-            client.workspace.on_did_create_files(count_event("file_ops"))
-        )
-        disposables.append(
-            client.workspace.on_did_delete_files(count_event("file_ops"))
-        )
-        disposables.append(
-            client.workspace.on_did_rename_files(count_event("file_ops"))
-        )
+        disposables.append(client.workspace.on_did_create_files(count_event("file_ops")))
+        disposables.append(client.workspace.on_did_delete_files(count_event("file_ops")))
+        disposables.append(client.workspace.on_did_rename_files(count_event("file_ops")))
 
         # Monitor for 15 seconds
         print("⏱️  Monitoring for 15 seconds...")

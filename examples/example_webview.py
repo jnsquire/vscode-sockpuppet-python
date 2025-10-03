@@ -110,9 +110,7 @@ with VSCodeClient() as client:
     """
 
     # Create webview with JavaScript enabled
-    options = WebviewOptions(
-        enable_scripts=True, retain_context_when_hidden=True
-    )
+    options = WebviewOptions(enable_scripts=True, retain_context_when_hidden=True)
 
     panel = client.window.create_webview_panel(
         title="Python Webview Demo", html=html_content, options=options
@@ -128,9 +126,7 @@ with VSCodeClient() as client:
 
         if action == "increment":
             # Send counter update to webview
-            panel.post_message(
-                {"type": "updateCounter", "value": int(time.time()) % 100}
-            )
+            panel.post_message({"type": "updateCounter", "value": int(time.time()) % 100})
         elif action == "reset":
             panel.post_message({"type": "updateCounter", "value": 0})
         elif action == "hello":

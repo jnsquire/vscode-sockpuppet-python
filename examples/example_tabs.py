@@ -112,10 +112,7 @@ def close_inactive_groups(client: VSCodeClient):
 
     for group in groups:
         if not group.is_active:
-            print(
-                f"Closing group in column {group.view_column} "
-                f"({len(group.tabs)} tabs)"
-            )
+            print(f"Closing group in column {group.view_column} ({len(group.tabs)} tabs)")
             success = client.window.tab_groups.close_group(group)
             if success:
                 closed_count += 1
@@ -143,9 +140,7 @@ def watch_tab_changes(client: VSCodeClient):
 
     # Subscribe to events
     dispose1 = client.window.tab_groups.on_did_change_tabs(on_tabs_changed)
-    dispose2 = client.window.tab_groups.on_did_change_tab_groups(
-        on_groups_changed
-    )
+    dispose2 = client.window.tab_groups.on_did_change_tab_groups(on_groups_changed)
 
     try:
         while True:
@@ -177,9 +172,7 @@ def find_tabs_by_name(client: VSCodeClient, search_term: str):
 
     print(f"Found {len(found_tabs)} matching tab(s):\n")
     for group, tab in found_tabs:
-        print(
-            f"  - {tab.label} (Group column {group.view_column})"
-        )
+        print(f"  - {tab.label} (Group column {group.view_column})")
 
 
 def count_file_types(client: VSCodeClient):
@@ -196,14 +189,10 @@ def count_file_types(client: VSCodeClient):
                 ext = tab.label.rsplit(".", 1)[-1]
                 extensions[ext] = extensions.get(ext, 0) + 1
             else:
-                extensions["(no extension)"] = (
-                    extensions.get("(no extension)", 0) + 1
-                )
+                extensions["(no extension)"] = extensions.get("(no extension)", 0) + 1
 
     print("File type distribution:")
-    for ext, count in sorted(
-        extensions.items(), key=lambda x: x[1], reverse=True
-    ):
+    for ext, count in sorted(extensions.items(), key=lambda x: x[1], reverse=True):
         print(f"  .{ext}: {count} tab(s)")
 
     total_tabs = sum(extensions.values())

@@ -35,6 +35,7 @@ class Window:
         """Get the tab groups manager."""
         if self._tab_groups is None:
             from .tabs import TabGroups
+
             self._tab_groups = TabGroups(self.client)
         return self._tab_groups
 
@@ -88,9 +89,7 @@ class Window:
         """Event fired when the window state changes (focus)."""
         return self._events.on_did_change_window_state
 
-    def show_information_message(
-        self, message: str, *items: str
-    ) -> Optional[str]:
+    def show_information_message(self, message: str, *items: str) -> Optional[str]:
         """
         Show an information message.
 
@@ -155,9 +154,7 @@ class Window:
             "window.showQuickPick", {"items": items, "options": options or {}}
         )
 
-    def show_input_box(
-        self, options: Optional[InputBoxOptions] = None
-    ) -> Optional[str]:
+    def show_input_box(self, options: Optional[InputBoxOptions] = None) -> Optional[str]:
         """
         Show an input box.
 
@@ -167,13 +164,9 @@ class Window:
         Returns:
             The entered text or None if dismissed
         """
-        return self.client._send_request(
-            "window.showInputBox", {"options": options or {}}
-        )
+        return self.client._send_request("window.showInputBox", {"options": options or {}})
 
-    def show_open_dialog(
-        self, options: Optional[OpenDialogOptions] = None
-    ) -> Optional[list[str]]:
+    def show_open_dialog(self, options: Optional[OpenDialogOptions] = None) -> Optional[list[str]]:
         """
         Show a file open dialog to the user.
 
@@ -201,14 +194,10 @@ class Window:
                 'title': 'Select files or folders'
             })
         """
-        result = self.client._send_request(
-            "window.showOpenDialog", {"options": options or {}}
-        )
+        result = self.client._send_request("window.showOpenDialog", {"options": options or {}})
         return result.get("uris") if result else None
 
-    def show_save_dialog(
-        self, options: Optional[SaveDialogOptions] = None
-    ) -> Optional[str]:
+    def show_save_dialog(self, options: Optional[SaveDialogOptions] = None) -> Optional[str]:
         """
         Show a file save dialog to the user.
 
@@ -230,9 +219,7 @@ class Window:
                 # Write to the selected location
                 client.fs.write_text(uri, 'print("Hello")')
         """
-        result = self.client._send_request(
-            "window.showSaveDialog", {"options": options or {}}
-        )
+        result = self.client._send_request("window.showSaveDialog", {"options": options or {}})
         return result.get("uri") if result else None
 
     def show_text_document(
@@ -324,9 +311,7 @@ class Window:
         )
         return Terminal(self.client, result["terminalId"], name)
 
-    def set_status_bar_message(
-        self, text: str, hide_after_timeout: Optional[int] = None
-    ) -> dict:
+    def set_status_bar_message(self, text: str, hide_after_timeout: Optional[int] = None) -> dict:
         """
         Set a status bar message.
 

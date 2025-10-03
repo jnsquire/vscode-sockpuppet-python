@@ -67,10 +67,7 @@ class TabGroup:
     def __repr__(self) -> str:
         """String representation of the tab group."""
         active_str = " (active)" if self.is_active else ""
-        return (
-            f"TabGroup(column={self.view_column}, "
-            f"tabs={len(self.tabs)}{active_str})"
-        )
+        return f"TabGroup(column={self.view_column}, tabs={len(self.tabs)}{active_str})"
 
 
 class TabGroups:
