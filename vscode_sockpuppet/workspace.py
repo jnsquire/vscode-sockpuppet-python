@@ -11,6 +11,7 @@ from .events import WorkspaceEvents
 if TYPE_CHECKING:
     from .client import VSCodeClient
     from .filewatcher import FileSystemWatcher
+    from .window_types import WorkspaceEdit
 
 
 class Environment:
@@ -418,6 +419,77 @@ class Workspace:
             },
         )
         return result["relativePath"]
+
+    def apply_edit(self, edit: "WorkspaceEdit") -> dict:
+        """
+        Apply a workspace edit.
+
+        This allows making changes to multiple files atomically. The edit can
+        include text changes, file creates, file deletes, and file renames.
+
+        Args:
+            edit: WorkspaceEdit dict containing:
+                - documentChanges: List of TextDocumentEdit dicts (optional)
+                - createFiles: List of CreateFileOperation dicts (optional)
+                - deleteFiles: List of DeleteFileOperation dicts (optional)
+                - renameFiles: List of RenameFileOperation dicts (optional)
+
+        Returns:
+            Dict with:
+                - success: True if edit was applied
+
+        Example:
+            from vscode_sockpuppet import (
+                WorkspaceEdit, TextDocumentEdit, TextEdit, Range, Position
+            )
+
+            # Create a workspace edit with text changes
+            edit: WorkspaceEdit = {
+                "documentChanges": [
+                    {
+                        "uri": "file:///path/to/file.py",
+                        "edits": [
+                            {
+                                "range": {
+                                    "start": {"line": 0, "character": 0},
+                                    "end": {"line": 0, "character": 0}
+                                },
+                                "newText": "# New header comment\\n"
+                            }
+                        ]
+                    }
+                ]
+            }
+            result = client.workspace.apply_edit(edit)
+            print(f"Edit applied: {result['success']}")
+
+            # Create a file and add content
+            edit: WorkspaceEdit = {
+                "createFiles": [
+                    {"uri": "file:///path/to/new_file.py"}
+                ],
+                "documentChanges": [
+                    {
+                        "uri": "file:///path/to/new_file.py",
+                        "edits": [
+                            {
+                                "range": {
+                                    "start": {"line": 0, "character": 0},
+                                    "end": {"line": 0, "character": 0}
+                                },
+                                "newText": "print('Hello, world!')\\n"
+                            }
+                        ]
+                    }
+                ]
+            }
+            result = client.workspace.apply_edit(edit)
+        """
+        # TypedDict is treated as dict at runtime
+        return self.client._send_request(
+            "workspace.applyEdit",
+            dict(edit),  # type: ignore[arg-type]
+        )
 
     def get_configuration(
         self, section: Optional[str] = None, scope: Optional[str] = None

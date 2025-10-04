@@ -14,8 +14,8 @@ from .diagnostics import (
     create_position,
     create_range,
 )
-from .document import Position, Range, TextDocument, TextLine
-from .editor import EditBuilder, Editor
+from .document import TextDocument, TextLine
+from .editor import DecorationType, EditBuilder, Editor
 from .filewatcher import FileSystemWatcher
 from .fs import FileStat, FileSystem, FileType
 from .progress import Progress, ProgressLocation, with_progress
@@ -29,11 +29,24 @@ from .terminal import Terminal
 from .webview import WebviewOptions, WebviewPanel
 from .window import Window
 from .window_types import (
+    CreateFileOperation,
+    DecorationRenderOptions,
+    DeleteFileOperation,
     InputBoxOptions,
     OpenDialogOptions,
+    PositionDict,
     QuickPickOptions,
+    RangeDict,
+    RenameFileOperation,
     SaveDialogOptions,
+    TextDocumentEdit,
     TextDocumentShowOptions,
+    TextEdit,
+    ThemableDecorationAttachmentRenderOptions,
+    ThemableDecorationRenderOptions,
+    WindowState,
+    WorkspaceEdit,
+    WorkspaceFolderPickOptions,
 )
 from .workspace import Environment, Workspace
 
@@ -45,18 +58,32 @@ __all__ = [
     "Environment",
     "Editor",
     "EditBuilder",
+    "DecorationType",
     "TextDocument",
-    "Position",
-    "Range",
+    "PositionDict",
+    "RangeDict",
     "TextLine",
     "FileSystemWatcher",
     "WebviewPanel",
     "WebviewOptions",
     "QuickPickOptions",
     "InputBoxOptions",
+    "PositionDict",
+    "RangeDict",
+    "TextEdit",
+    "TextDocumentEdit",
+    "WorkspaceEdit",
+    "CreateFileOperation",
+    "DeleteFileOperation",
+    "RenameFileOperation",
+    "DecorationRenderOptions",
+    "ThemableDecorationRenderOptions",
+    "ThemableDecorationAttachmentRenderOptions",
     "OpenDialogOptions",
     "SaveDialogOptions",
     "TextDocumentShowOptions",
+    "WorkspaceFolderPickOptions",
+    "WindowState",
     "FileSystem",
     "FileStat",
     "FileType",

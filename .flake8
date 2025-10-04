@@ -1,0 +1,28 @@
+[flake8]
+# Match ruff configuration
+max-line-length = 99
+extend-ignore = 
+    # E501: line too long (handled by ruff formatter)
+    E501,
+    # F821: undefined name (handled by type checker for TYPE_CHECKING imports)
+    F821,
+    # Ignore string formatting preferences that ruff handles
+    E203,
+    # Ignore whitespace before ':' (black/ruff compatibility)
+    E203,
+
+# Exclude common directories
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    .mypy_cache,
+    .ruff_cache,
+
+# Target Python 3.8+
+max-complexity = 10

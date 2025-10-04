@@ -26,6 +26,85 @@ class Position:
     def from_dict(cls, data: dict) -> "Position":
         return cls(line=data["line"], character=data["character"])
 
+    def is_before(self, other: "Position") -> bool:
+        """Check if this position is before another position."""
+        if self.line < other.line:
+            return True
+        if self.line == other.line and self.character < other.character:
+            return True
+        return False
+
+    def is_before_or_equal(self, other: "Position") -> bool:
+        """Check if this position is before or equal to another."""
+        return self.is_before(other) or self.is_equal(other)
+
+    def is_after(self, other: "Position") -> bool:
+        """Check if this position is after another position."""
+        return not self.is_before_or_equal(other)
+
+    def is_after_or_equal(self, other: "Position") -> bool:
+        """Check if this position is after or equal to another."""
+        return not self.is_before(other)
+
+    def is_equal(self, other: "Position") -> bool:
+        """Check if this position is equal to another position."""
+        return self.line == other.line and self.character == other.character
+
+    def compare_to(self, other: "Position") -> int:
+        """
+        Compare this position to another.
+
+        Returns:
+            Negative if this < other, 0 if equal, positive if this > other
+        """
+        if self.line < other.line:
+            return -1
+        if self.line > other.line:
+            return 1
+        return self.character - other.character
+
+    def translate(self, line_delta: int = 0, character_delta: int = 0) -> "Position":
+        """
+        Create a new position relative to this position.
+
+        Args:
+            line_delta: Delta for line value (default 0)
+            character_delta: Delta for character value (default 0)
+
+        Returns:
+            New Position object
+        """
+        return Position(
+            line=self.line + line_delta,
+            character=self.character + character_delta,
+        )
+
+    def with_line(self, line: int) -> "Position":
+        """Create a new position with a different line number."""
+        return Position(line=line, character=self.character)
+
+    def with_character(self, character: int) -> "Position":
+        """Create a new position with a different character."""
+        return Position(line=self.line, character=character)
+
+    # Python-specific methods for convenience
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Position):
+            return NotImplemented
+        return self.is_equal(other)
+
+    def __lt__(self, other: "Position") -> bool:
+        return self.is_before(other)
+
+    def __le__(self, other: "Position") -> bool:
+        return self.is_before_or_equal(other)
+
+    def __gt__(self, other: "Position") -> bool:
+        return self.is_after(other)
+
+    def __ge__(self, other: "Position") -> bool:
+        return self.is_after_or_equal(other)
+
 
 @dataclass
 class Range:
@@ -50,12 +129,85 @@ class Range:
     @property
     def is_empty(self) -> bool:
         """Check if this range is empty (start == end)."""
-        return self.start.line == self.end.line and self.start.character == self.end.character
+        return self.start.is_equal(self.end)
 
     @property
     def is_single_line(self) -> bool:
         """Check if this range is on a single line."""
         return self.start.line == self.end.line
+
+    def contains(self, position_or_range: "Position | Range") -> bool:
+        """
+        Check if a position or range is contained in this range.
+
+        Args:
+            position_or_range: Position or Range to check
+
+        Returns:
+            True if contained within this range
+        """
+        if isinstance(position_or_range, Position):
+            pos = position_or_range
+            return self.start.is_before_or_equal(pos) and self.end.is_after_or_equal(pos)
+        else:
+            other_range = position_or_range
+            return self.start.is_before_or_equal(other_range.start) and self.end.is_after_or_equal(
+                other_range.end
+            )
+
+    def is_equal(self, other: "Range") -> bool:
+        """Check if this range is equal to another range."""
+        return self.start.is_equal(other.start) and self.end.is_equal(other.end)
+
+    def intersection(self, other: "Range") -> Optional["Range"]:
+        """
+        Compute the intersection of two ranges.
+
+        Args:
+            other: Another range
+
+        Returns:
+            The intersection range, or None if no intersection
+        """
+        # Find the later start and earlier end
+        start = self.start if self.start.is_after(other.start) else other.start
+        end = self.end if self.end.is_before(other.end) else other.end
+
+        # Check if valid intersection
+        if start.is_after(end):
+            return None
+        return Range(start=start, end=end)
+
+    def union(self, other: "Range") -> "Range":
+        """
+        Compute the union of two ranges.
+
+        Args:
+            other: Another range
+
+        Returns:
+            Range spanning both ranges
+        """
+        start = self.start if self.start.is_before(other.start) else other.start
+        end = self.end if self.end.is_after(other.end) else other.end
+        return Range(start=start, end=end)
+
+    def with_start(self, start: Position) -> "Range":
+        """Create a new range with a different start position."""
+        return Range(start=start, end=self.end)
+
+    def with_end(self, end: Position) -> "Range":
+        """Create a new range with a different end position."""
+        return Range(start=self.start, end=end)
+
+    # Python-specific methods for convenience
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Range):
+            return NotImplemented
+        return self.is_equal(other)
+
+    def __contains__(self, item: "Position | Range") -> bool:
+        return self.contains(item)
 
 
 class TextLine:
@@ -110,6 +262,7 @@ class TextDocument:
         self._is_closed = data["isClosed"]
         self._eol = data["eol"]
         self._line_count = data["lineCount"]
+        self._encoding = data["encoding"]
 
     @property
     def uri(self) -> str:
@@ -155,6 +308,16 @@ class TextDocument:
     def line_count(self) -> int:
         """The number of lines in this document."""
         return self._line_count
+
+    @property
+    def encoding(self) -> str:
+        """
+        The file encoding that will be used when the document is saved.
+
+        Common values include: 'utf8', 'utf8bom', 'utf16le', 'utf16be',
+        'windows1252', 'iso88591', etc.
+        """
+        return self._encoding
 
     def save(self) -> bool:
         """

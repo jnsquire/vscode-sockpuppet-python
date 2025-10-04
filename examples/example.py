@@ -17,7 +17,7 @@ def main():
         # Show a quick pick
         choice = vscode.window.show_quick_pick(
             ["Python", "JavaScript", "TypeScript", "Go"],
-            { "placeholder": "Select your favorite language" },
+            {"placeholder": "Select your favorite language"},
         )
         print(f"Favorite language: {choice}")
 

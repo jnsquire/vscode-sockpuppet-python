@@ -12,6 +12,7 @@ from .window_types import (
     QuickPickOptions,
     SaveDialogOptions,
     TextDocumentShowOptions,
+    WindowState,
 )
 
 if TYPE_CHECKING:
@@ -222,6 +223,22 @@ class Window:
         result = self.client._send_request("window.showSaveDialog", {"options": options or {}})
         return result.get("uri") if result else None
 
+    def show_workspace_folder_pick(self, options: Optional[dict] = None) -> Optional[dict]:
+        """
+        Show a workspace folder picker to the user.
+
+        Args:
+            options: Optional picker options (placeHolder, ignoreFocusOut)
+
+        Returns:
+            A dict with `uri`, `name`, and `index` for the selected folder,
+            or None if canceled.
+        """
+        result = self.client._send_request(
+            "window.showWorkspaceFolderPick", {"options": options or {}}
+        )
+        return result if result else None
+
     def show_text_document(
         self, uri: str, options: Optional[TextDocumentShowOptions] = None
     ) -> dict:
@@ -238,6 +255,24 @@ class Window:
         return self.client._send_request(
             "window.showTextDocument", {"uri": uri, "options": options or {}}
         )
+
+    def visible_text_editors(self) -> list[dict]:
+        """
+        Get a list of currently visible text editors.
+
+        Returns:
+            A list of dicts with `uri`, `viewColumn`, and `selection` info.
+        """
+        return self.client._send_request("window.visibleTextEditors", {})
+
+    def get_state(self) -> WindowState:
+        """
+        Get the current window state (focused flag).
+
+        Returns:
+            A dict with `focused` boolean indicating window focus.
+        """
+        return self.client._send_request("window.state", {})
 
     def create_output_channel(
         self,

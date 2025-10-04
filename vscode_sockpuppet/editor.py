@@ -2,10 +2,82 @@
 Editor operations for VS Code
 """
 
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional, Union
+
+from .window_types import DecorationRenderOptions, PositionDict, RangeDict
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
+    from .document import Position, Range
+
+# Type aliases for flexibility
+PositionType = Union[PositionDict, "Position"]
+RangeType = Union[RangeDict, "Range"]
+
+
+def _normalize_position(pos: PositionType) -> PositionDict:
+    """Convert Position (dataclass or dict) to dict format."""
+    if isinstance(pos, dict):
+        return pos  # type: ignore[return-value]
+    # It's a Position dataclass from document.py
+    return {"line": pos.line, "character": pos.character}
+
+
+def _normalize_range(rng: RangeType) -> RangeDict:
+    """Convert Range (dataclass or dict) to dict format."""
+    if isinstance(rng, dict):
+        return rng  # type: ignore[return-value]
+    # It's a Range dataclass from document.py
+    return {
+        "start": _normalize_position(rng.start),
+        "end": _normalize_position(rng.end),
+    }
+
+
+class DecorationType:
+    """
+    Wrapper for a text editor decoration type.
+
+    This object automatically disposes the server-side decoration
+    resource when it's garbage collected, preventing resource leaks.
+    """
+
+    def __init__(self, client: "VSCodeClient", decoration_id: str):
+        self._client = client
+        self.id = decoration_id
+        self._disposed = False
+
+    def dispose(self) -> dict:
+        """
+        Manually dispose the decoration type on the server.
+
+        Returns:
+            Success status from server
+        """
+        if self._disposed:
+            return {"success": True}
+
+        self._disposed = True
+        return self._client._send_request(
+            "window.disposeTextEditorDecorationType",
+            {"decorationId": self.id},
+        )
+
+    def __del__(self):
+        """Best-effort cleanup when object is garbage collected."""
+        if not self._disposed:
+            try:
+                self._client._send_request(
+                    "window.disposeTextEditorDecorationType",
+                    {"decorationId": self.id},
+                )
+            except Exception:
+                # Silently ignore errors during cleanup
+                pass
+
+    def __repr__(self) -> str:
+        status = "disposed" if self._disposed else "active"
+        return f"DecorationType(id={self.id!r}, {status})"
 
 
 class Editor:
@@ -189,7 +261,7 @@ class Editor:
     def insert_snippet(
         self,
         snippet: str,
-        location: Optional[dict] = None,
+        location: Optional[Union[PositionType, RangeType]] = None,
         undo_stop_before: bool = True,
         undo_stop_after: bool = True,
     ) -> bool:
@@ -198,7 +270,7 @@ class Editor:
 
         Args:
             snippet: Snippet string with placeholders ($1, $2, etc.)
-            location: Position or range dict, or None for current selection
+            location: Position/Range (dict or dataclass), or None for current
             undo_stop_before: Add undo stop before insertion
             undo_stop_after: Add undo stop after insertion
 
@@ -209,17 +281,45 @@ class Editor:
             # Insert at current position
             editor.insert_snippet("console.log('$1');$0")
 
-            # Insert at specific position
+            # Insert at specific position (dict)
             editor.insert_snippet(
                 "for (let ${1:i} = 0; $1 < ${2:10}; $1++) {\\n\\t$0\\n}",
                 location={"line": 5, "character": 0}
             )
+
+            # Or use Position/Range from document.py
+            from vscode_sockpuppet.document import Position
+            editor.insert_snippet("$0", location=Position(5, 0))
         """
+        # Normalize location to dict format
+        normalized_location = None
+        if location is not None:
+            if isinstance(location, dict):
+                # Check if it's a Position or Range dict
+                if "start" in location:
+                    normalized_location = _normalize_range(
+                        location  # type: ignore[arg-type]
+                    )
+                else:
+                    normalized_location = _normalize_position(
+                        location  # type: ignore[arg-type]
+                    )
+            else:
+                # It's a dataclass - check if Position or Range
+                if hasattr(location, "start"):
+                    normalized_location = _normalize_range(
+                        location  # type: ignore[arg-type]
+                    )
+                else:
+                    normalized_location = _normalize_position(
+                        location  # type: ignore[arg-type]
+                    )
+
         result = self.client._send_request(
             "window.activeTextEditor.insertSnippet",
             {
                 "snippet": snippet,
-                "location": location,
+                "location": normalized_location,
                 "undoStopBefore": undo_stop_before,
                 "undoStopAfter": undo_stop_after,
             },
@@ -283,18 +383,18 @@ class Editor:
         """
         return self.client._send_request("window.activeTextEditor.selections")
 
-    def set_selections(self, selections: list[dict]) -> dict:
+    def set_selections(self, selections: list[RangeType]) -> dict:
         """
-        Set multiple selections in the active editor.
+        Set multiple selections (multi-cursor support).
 
         Args:
-            selections: List of selection dicts with start and end positions
+            selections: List of Range objects (dict or dataclass)
 
         Returns:
             Success status
 
         Example:
-            # Select multiple ranges
+            # Using dicts
             editor.set_selections([
                 {
                     "start": {"line": 0, "character": 0},
@@ -305,10 +405,20 @@ class Editor:
                     "end": {"line": 2, "character": 5}
                 }
             ])
+
+            # Or using Range from document.py
+            from vscode_sockpuppet.document import Range, Position
+            editor.set_selections([
+                Range(Position(0, 0), Position(0, 5)),
+                Range(Position(2, 0), Position(2, 5))
+            ])
         """
+        # Normalize all ranges to dict format
+        normalized_selections = [_normalize_range(sel) for sel in selections]
+
         return self.client._send_request(
             "window.activeTextEditor.setSelections",
-            {"selections": selections},
+            {"selections": normalized_selections},
         )
 
     def get_options(self) -> dict:
@@ -373,6 +483,91 @@ class Editor:
             print(f"Editor in column: {column}")
         """
         return self.client._send_request("window.activeTextEditor.viewColumn")
+
+    def create_decoration_type(self, options: DecorationRenderOptions) -> DecorationType:
+        """
+        Create a text editor decoration type.
+
+        The returned DecorationType object will automatically dispose the
+        server-side resource when garbage collected. Call dispose() manually
+        for immediate cleanup.
+
+        Args:
+            options: DecorationRenderOptions dict with styling options
+
+        Returns:
+            DecorationType object with `id` attribute and dispose() method
+
+        Example:
+            from vscode_sockpuppet import DecorationRenderOptions
+
+            # Type-safe decoration options
+            options: DecorationRenderOptions = {
+                "backgroundColor": "rgba(255, 0, 0, 0.3)",
+                "border": "1px solid red",
+                "borderRadius": "3px",
+                "isWholeLine": True,
+                "overviewRulerLane": 2,  # Center
+                "light": {
+                    "backgroundColor": "rgba(255, 0, 0, 0.1)"
+                },
+                "dark": {
+                    "backgroundColor": "rgba(255, 0, 0, 0.3)"
+                }
+            }
+            decoration = editor.create_decoration_type(options)
+            editor.set_decorations(decoration, [range1, range2])
+
+            # Manual disposal
+            decoration.dispose()
+        """
+        result = self.client._send_request(
+            "window.createTextEditorDecorationType", {"options": options}
+        )
+        return DecorationType(self.client, result.get("id"))
+
+    def set_decorations(
+        self, decoration: Union[DecorationType, str], ranges: list[RangeType]
+    ) -> dict:
+        """
+        Apply decorations to the active text editor.
+
+        Args:
+            decoration: DecorationType object or decoration ID string
+            ranges: List of Range objects (dict or dataclass)
+
+        Returns:
+            Success status
+
+        Example:
+            decoration = editor.create_decoration_type({
+                "backgroundColor": "yellow"
+            })
+
+            # Using dicts
+            ranges = [{
+                "start": {"line": 0, "character": 0},
+                "end": {"line": 0, "character": 10}
+            }]
+            editor.set_decorations(decoration, ranges)
+
+            # Or using Range from document.py
+            from vscode_sockpuppet.document import Range, Position
+            ranges = [Range(Position(0, 0), Position(0, 10))]
+            editor.set_decorations(decoration, ranges)
+        """
+        if isinstance(decoration, DecorationType):
+            dec_id = decoration.id
+        else:
+            dec_id = decoration
+
+        # Normalize all ranges to dict format
+        normalized_ranges = [_normalize_range(r) for r in ranges]
+
+        return self.client._send_request(
+            "window.activeTextEditor.setDecorations",
+            {"decorationId": dec_id, "ranges": normalized_ranges},
+        )
 
 
 class EditBuilder:
