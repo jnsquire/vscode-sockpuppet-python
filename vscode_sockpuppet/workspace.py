@@ -180,6 +180,34 @@ class Environment:
         """
         return self.client._send_request("env.openExternal", {"uri": uri})
 
+    def as_external_uri(self, uri: str) -> str:
+        """
+        Convert a URI to an external URI that can be opened outside VS Code.
+
+        This resolves the authority part of a URI using VS Code's port
+        forwarding and tunneling features. For example, when running in a
+        remote SSH session, this converts localhost URIs to publicly
+        accessible URIs.
+
+        Args:
+            uri: The URI to convert (typically a localhost or internal URI)
+
+        Returns:
+            The external URI as a string
+
+        Example:
+            # Convert localhost URI when running remotely
+            external = client.workspace.env.as_external_uri(
+                "http://localhost:3000"
+            )
+            print(f"Public URL: {external}")
+
+            # Convert workspace file URI
+            file_uri = "file:///workspace/file.txt"
+            external = client.workspace.env.as_external_uri(file_uri)
+        """
+        return self.client._send_request("env.asExternalUri", {"uri": uri})
+
 
 class Workspace:
     """VS Code workspace operations."""

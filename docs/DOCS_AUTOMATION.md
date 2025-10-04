@@ -16,11 +16,10 @@ An automated documentation generation system that extracts API documentation dir
 ## Files Created
 
 ### Configuration
-- `python/mkdocs.yml` - MkDocs configuration with project-wide options
-- Updated `python/pyproject.toml` - Added `docs` optional dependency group
+- `mkdocs.yml` - MkDocs configuration with project-wide options
 
 ### Documentation Source
-- `python/docs_src/index.md` - Homepage with quick start
+- `docs_src/index.md` - Homepage with quick start
 - `python/docs_src/api/index.md` - API overview
 - `python/docs_src/api/*.md` - 16 API reference pages (one per module)
 - `python/docs_src/README.md` - Documentation guide
