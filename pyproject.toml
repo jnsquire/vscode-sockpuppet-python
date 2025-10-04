@@ -42,8 +42,8 @@ docs = [
 [project.urls]
 Homepage = "https://github.com/jnsquire/vscode-sockpuppet-python"
 Repository = "https://github.com/jnsquire/vscode-sockpuppet-python"
-Documentation = "https://jnsquire.github.io/vscode-sockpuppet-extension/"
-"Bug Tracker" = "https://github.com/jnsquire/vscode-sockpuppet-extension/issues"
+Documentation = "https://jnsquire.github.io/vscode-sockpuppet-python/"
+"Bug Tracker" = "https://github.com/jnsquire/vscode-sockpuppet-python/issues"
 
 [build-system]
 requires = ["hatchling"]

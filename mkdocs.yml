@@ -1,11 +1,11 @@
 site_name: VSCode Sockpuppet Python API
 site_description: Python client for programmatically controlling VS Code
 site_author: Joel Squire
-site_url: https://github.com/jnsquire/vscode-sockpuppet-python
+site_url: https://jnsquire.github.io/vscode-sockpuppet-python/
 
 repo_name: jnsquire/vscode-sockpuppet-python
 repo_url: https://github.com/jnsquire/vscode-sockpuppet-python
-edit_uri: edit/main/
+edit_uri: edit/main/docs_src/
 
 # Source directory for documentation
 docs_dir: docs_src
