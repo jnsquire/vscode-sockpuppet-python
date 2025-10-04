@@ -18,6 +18,11 @@ from .document import TextDocument, TextLine
 from .editor import DecorationType, EditBuilder, Editor
 from .filewatcher import FileSystemWatcher
 from .fs import FileStat, FileSystem, FileType
+from .language_model import (
+    LanguageModel,
+    LanguageModelChat,
+    LanguageModelChatMessage,
+)
 from .progress import Progress, ProgressLocation, with_progress
 from .statusbar import (
     StatusBarAlignment,
@@ -107,4 +112,7 @@ __all__ = [
     "with_progress",
     "WorkspaceConfiguration",
     "ConfigurationTarget",
+    "LanguageModel",
+    "LanguageModelChat",
+    "LanguageModelChatMessage",
 ]

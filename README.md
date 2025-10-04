@@ -29,9 +29,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 # Install the package
 cd python
 uv pip install -e .
-
-# On Windows, also install:
-uv pip install -e ".[windows]"
+```
 
 # Or create a virtual environment with uv
 uv venv

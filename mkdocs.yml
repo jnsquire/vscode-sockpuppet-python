@@ -112,6 +112,7 @@ nav:
     - Progress: api/progress.md
     - StatusBar: api/statusbar.md
     - FileWatcher: api/filewatcher.md
+    - Language Model: api/language_model.md
     - Types: api/types.md
   - Guides:
     - Development: guides/development.md

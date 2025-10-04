@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, Optional, Union
 from .diagnostics import Languages
 from .editor import Editor
 from .fs import FileSystem
+from .language_model import LanguageModel
 from .window import Window
 from .workspace import Workspace
 
@@ -54,53 +55,55 @@ class VSCodeClient:
         self.editor = Editor(self)
         self.fs = FileSystem(self)
         self.languages = Languages(self)
+        self.lm = LanguageModel(self)
 
     def connect(self) -> None:
         """Connect to the VS Code extension via named pipe/socket."""
         if os.name == "nt":  # Windows named pipe
             try:
-                import win32file  # type: ignore
-                import win32pipe  # type: ignore
+                # On Windows, use standard file operations for named pipes
+                # Python 3 can open named pipes like regular files
+                import time
 
-                # Wait for pipe to become available
-                win32pipe.WaitNamedPipe(self.pipe_path, 5000)
+                # Wait for pipe to be available (retry for up to 5 seconds)
+                max_retries = 50
+                retry_delay = 0.1
 
-                # Open the named pipe
-                self.sock = win32file.CreateFile(
-                    self.pipe_path,
-                    win32file.GENERIC_READ | win32file.GENERIC_WRITE,
-                    0,
-                    None,
-                    win32file.OPEN_EXISTING,
-                    0,
-                    None,
-                )
-            except ImportError as e:
-                raise ImportError(
-                    "pywin32 is required on Windows. Install with: pip install pywin32"
-                ) from e
+                for attempt in range(max_retries):
+                    try:
+                        # Open named pipe with read/write binary mode
+                        self.sock = open(self.pipe_path, "r+b", buffering=0)
+                        break
+                    except FileNotFoundError as e:
+                        if attempt < max_retries - 1:
+                            time.sleep(retry_delay)
+                        else:
+                            raise ConnectionError(
+                                f"Named pipe not found: {self.pipe_path}. "
+                                "Make sure VS Code extension is running."
+                            ) from e
+                    except PermissionError as e:
+                        raise ConnectionError(f"Permission denied accessing pipe: {e}") from e
             except Exception as e:
-                raise ConnectionError(
-                    f"Could not connect to VS Code. Make sure the extension is running. Error: {e}"
-                ) from e
+                if not isinstance(e, ConnectionError):
+                    raise ConnectionError(
+                        f"Could not connect to VS Code. Make sure extension is running. Error: {e}"
+                    ) from e
+                raise
         else:  # Unix domain socket
             self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             try:
                 self.sock.connect(self.pipe_path)
             except Exception as e:
                 raise ConnectionError(
-                    f"Could not connect to VS Code. Make sure the extension is running. Error: {e}"
+                    f"Could not connect to VS Code. Make sure extension is running. Error: {e}"
                 ) from e
 
     def disconnect(self) -> None:
         """Disconnect from the VS Code extension."""
         if self.sock:
             try:
-                if os.name == "nt":
-                    import win32file  # type: ignore
-
-                    win32file.CloseHandle(self.sock)
-                else:
+                if hasattr(self.sock, "close"):
                     self.sock.close()
             except Exception:
                 pass
@@ -136,22 +139,26 @@ class VSCodeClient:
 
         # Send request with newline delimiter
         message = json.dumps(request) + "\n"
+        message_bytes = message.encode("utf-8")
 
         if os.name == "nt":
-            import win32file  # type: ignore
-
-            win32file.WriteFile(self.sock, message.encode("utf-8"))
+            # Windows named pipe opened as file
+            self.sock.write(message_bytes)  # type: ignore
+            self.sock.flush()  # type: ignore
         else:
-            self.sock.sendall(message.encode("utf-8"))  # type: ignore
+            # Unix socket
+            self.sock.sendall(message_bytes)  # type: ignore
 
         # Receive response
         while True:
             if os.name == "nt":
-                import win32file  # type: ignore
-
-                hr, data = win32file.ReadFile(self.sock, 4096)
-                chunk = data.decode("utf-8")
+                # Read from Windows named pipe
+                chunk_bytes = self.sock.read(4096)  # type: ignore
+                if not chunk_bytes:
+                    raise ConnectionError("Connection closed by VS Code")
+                chunk = chunk_bytes.decode("utf-8")
             else:
+                # Read from Unix socket
                 chunk_bytes = self.sock.recv(4096)  # type: ignore
                 if not chunk_bytes:
                     raise ConnectionError("Connection closed by VS Code")
@@ -273,11 +280,13 @@ class VSCodeClient:
         while self._running:
             try:
                 if os.name == "nt":
-                    import win32file  # type: ignore
-
-                    hr, data = win32file.ReadFile(self.sock, 4096)
-                    chunk = data
+                    # Read from Windows named pipe
+                    chunk_bytes = self.sock.read(4096)  # type: ignore
+                    if not chunk_bytes:
+                        break
+                    chunk = chunk_bytes.decode("utf-8")
                 else:
+                    # Read from Unix socket
                     chunk_bytes = self.sock.recv(4096)  # type: ignore
                     if not chunk_bytes:
                         break
