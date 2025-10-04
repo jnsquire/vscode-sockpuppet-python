@@ -69,12 +69,9 @@ print("\n\n3. Code Explanation Workflow:")
 print("-" * 70)
 
 # Get the active editor's selected code
-editor = client.editor.get_active_text_editor()
-if editor and editor.selection:
-    # Get selected text
-    doc = client.workspace.open_text_document(editor.document["uri"])
-    selection_range = editor.selection
-    selected_text = doc.get_text_range(selection_range)
+try:
+    selection = client.editor.get_selection()
+    selected_text = selection.get("text", "")
 
     if selected_text.strip():
         print(f"Selected code:\n{selected_text}\n")
@@ -93,8 +90,8 @@ if editor and editor.selection:
         client.window.show_information_message(f"Code Explanation:\n\n{explanation[:200]}...")
     else:
         print("No code selected. Select some code and run again.")
-else:
-    print("No active editor or selection.")
+except Exception as e:
+    print(f"No active editor or selection. Error: {e}")
 
 # Example 4: Multi-turn conversation
 print("\n\n4. Multi-turn Conversation:")

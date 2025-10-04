@@ -31,7 +31,11 @@ class WebviewPanel:
         self._title = title
         self._disposed = False
         self._message_handlers: list[Callable[[Any], None]] = []
+        self._dispose_handlers: list[Callable[[], None]] = []
+        self._view_state_handlers: list[Callable[[dict], None]] = []
         self._subscription_active = False
+        self._dispose_subscription_active = False
+        self._view_state_subscription_active = False
 
     @property
     def id(self) -> str:
@@ -212,13 +216,102 @@ class WebviewPanel:
 
         return unsubscribe
 
+    def on_did_dispose(self, handler: Callable[[], None]) -> Callable[[], None]:
+        """
+        Subscribe to the panel disposal event.
+
+        The handler will be called when the webview panel is disposed,
+        either by calling dispose() or when the user closes the panel.
+
+        Args:
+            handler: Callback function called when the panel is disposed
+
+        Returns:
+            A function that can be called to unsubscribe the handler
+
+        Example::
+
+            def on_dispose():
+                print("Webview was closed")
+
+            # Subscribe
+            unsubscribe = panel.on_did_dispose(on_dispose)
+
+            # Later, to unsubscribe
+            unsubscribe()
+        """
+        if self._disposed:
+            # Already disposed, call handler immediately
+            handler()
+            return lambda: None
+
+        # Add handler to our list
+        self._dispose_handlers.append(handler)
+
+        # Set up global subscription if not already active
+        if not self._dispose_subscription_active:
+            self._setup_dispose_subscription()
+            self._dispose_subscription_active = True
+
+        # Return unsubscribe function
+        def unsubscribe():
+            if handler in self._dispose_handlers:
+                self._dispose_handlers.remove(handler)
+
+        return unsubscribe
+
+    def on_did_change_view_state(self, handler: Callable[[dict], None]) -> Callable[[], None]:
+        """
+        Subscribe to view state change events.
+
+        The handler will be called when the panel's visibility or active
+        state changes (e.g., when the user switches tabs or focuses the panel).
+
+        Args:
+            handler: Callback function that receives a dict with 'visible' and 'active' keys
+
+        Returns:
+            A function that can be called to unsubscribe the handler
+
+        Example::
+
+            def on_view_state_change(state):
+                print(f"Visible: {state['visible']}, Active: {state['active']}")
+                if state['active']:
+                    print("Panel is now in focus!")
+
+            # Subscribe
+            unsubscribe = panel.on_did_change_view_state(on_view_state_change)
+
+            # Later, to unsubscribe
+            unsubscribe()
+        """
+        if self._disposed:
+            return lambda: None
+
+        # Add handler to our list
+        self._view_state_handlers.append(handler)
+
+        # Set up global subscription if not already active
+        if not self._view_state_subscription_active:
+            self._setup_view_state_subscription()
+            self._view_state_subscription_active = True
+
+        # Return unsubscribe function
+        def unsubscribe():
+            if handler in self._view_state_handlers:
+                self._view_state_handlers.remove(handler)
+
+        return unsubscribe
+
     def _setup_message_subscription(self) -> None:
         """Set up the global webview message event subscription."""
 
         def global_handler(event):
             # Filter messages for this specific panel
-            if event["data"].get("id") == self._id:
-                message = event["data"]["message"]
+            # event is the data dict with 'id' and 'message' keys
+            if event.get("id") == self._id:
+                message = event["message"]
                 # Call all registered handlers
                 for handler in self._message_handlers[:]:
                     try:
@@ -228,17 +321,65 @@ class WebviewPanel:
 
         self._client.subscribe("webview.onDidReceiveMessage", global_handler)
 
+    def _setup_dispose_subscription(self) -> None:
+        """Set up the global webview disposal event subscription."""
+
+        def global_handler(event):
+            # Filter disposal events for this specific panel
+            if event.get("id") == self._id:
+                # Mark as disposed
+                self._disposed = True
+                # Call all registered dispose handlers
+                for handler in self._dispose_handlers[:]:
+                    try:
+                        handler()
+                    except Exception as e:
+                        print(f"Error in webview dispose handler: {e}")
+                # Clear handlers after calling them
+                self._dispose_handlers.clear()
+
+        self._client.subscribe("webview.onDidDispose", global_handler)
+
+    def _setup_view_state_subscription(self) -> None:
+        """Set up the global webview view state change event subscription."""
+
+        def global_handler(event):
+            # Filter events for this specific panel
+            if event.get("id") == self._id:
+                state = {
+                    "visible": event.get("visible", False),
+                    "active": event.get("active", False)
+                }
+                # Call all registered view state handlers
+                for handler in self._view_state_handlers[:]:
+                    try:
+                        handler(state)
+                    except Exception as e:
+                        print(f"Error in webview view state handler: {e}")
+
+        self._client.subscribe("webview.onDidChangeViewState", global_handler)
+
     def dispose(self) -> None:
         """
         Dispose of the webview panel, closing it in VS Code.
 
         After disposal, the panel cannot be used anymore.
+        This will trigger any registered on_did_dispose handlers.
         """
         if self._disposed:
             return
 
         self._client._send_request("window.disposeWebviewPanel", {"id": self._id})
         self._disposed = True
+
+        # Call dispose handlers
+        for handler in self._dispose_handlers[:]:
+            try:
+                handler()
+            except Exception as e:
+                print(f"Error in webview dispose handler: {e}")
+        # Clear handlers after calling them
+        self._dispose_handlers.clear()
 
     def __enter__(self):
         """Context manager entry."""

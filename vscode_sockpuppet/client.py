@@ -228,18 +228,18 @@ class VSCodeClient:
             - workspace.onDidChangeWorkspaceFolders
             - workspace.onDidChangeConfiguration
         """
+        # Start event listener thread if not running
+        if not self._running and self._event_thread is None:
+            self._running = True
+            self._event_thread = threading.Thread(target=self._event_loop, daemon=True)
+            self._event_thread.start()
+
         if event not in self._event_handlers:
             self._event_handlers[event] = []
             # Subscribe on server
             self._send_request("events.subscribe", {"event": event})
 
         self._event_handlers[event].append(handler)
-
-        # Start event listener thread if not running
-        if not self._running and self._event_thread is None:
-            self._running = True
-            self._event_thread = threading.Thread(target=self._event_loop, daemon=True)
-            self._event_thread.start()
 
     def unsubscribe(self, event: str, handler: Optional[Callable] = None) -> None:
         """

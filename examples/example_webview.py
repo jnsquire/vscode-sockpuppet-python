@@ -6,6 +6,27 @@ import time
 
 from vscode_sockpuppet import VSCodeClient, WebviewOptions
 
+
+class WebviewState:
+    """Manages state for the webview demo."""
+
+    def __init__(self):
+        self.counter = 0
+        self.running = True
+
+    def increment(self):
+        """Increment the counter."""
+        self.counter += 1
+
+    def reset(self):
+        """Reset the counter to zero."""
+        self.counter = 0
+
+    def stop(self):
+        """Stop the main loop."""
+        self.running = False
+
+
 with VSCodeClient() as client:
     print("Creating webview panel...")
 
@@ -117,6 +138,16 @@ with VSCodeClient() as client:
     ) as panel:
         print(f"Created webview panel: {panel.id}")
 
+        # Create state object to manage counter and running status
+        state = WebviewState()
+
+        # Subscribe to disposal event to exit when webview is closed
+        def on_dispose():
+            print("\n🔔 Webview was closed!")
+            state.stop()
+
+        panel.on_did_dispose(on_dispose)
+
         # Subscribe to messages from the webview using the panel method
         def handle_message(message):
             print(f"Message from webview: {message}")
@@ -125,10 +156,13 @@ with VSCodeClient() as client:
             print(f"Received message from webview: {action}")
 
             if action == "increment":
-                # Send counter update to webview
-                panel.post_message({"type": "updateCounter", "value": int(time.time()) % 100})
+                # Increment the Python counter
+                state.increment()
+                panel.post_message({"type": "updateCounter", "value": state.counter})
             elif action == "reset":
-                panel.post_message({"type": "updateCounter", "value": 0})
+                # Reset the Python counter
+                state.reset()
+                panel.post_message({"type": "updateCounter", "value": state.counter})
             elif action == "hello":
                 panel.post_message(
                     {
@@ -142,22 +176,25 @@ with VSCodeClient() as client:
 
         # Update the webview periodically
         print("Webview is running. Try clicking the buttons!")
-        print("Press Ctrl+C to exit...")
+        print("Close the webview panel to exit, or press Ctrl+C...")
 
         try:
-            counter = 0
-            while True:
+            while state.running:
                 time.sleep(3)
-                counter += 1
+                state.increment()
 
                 # Update the counter from Python
-                panel.post_message({"type": "updateCounter", "value": counter})
+                if state.running:  # Check if still running before sending
+                    panel.post_message({"type": "updateCounter", "value": state.counter})
 
                 # Every 10 seconds, update the title
-                if counter % 10 == 0:
-                    panel.update_title(f"Python Webview Demo - Count: {counter}")
+                if state.counter % 10 == 0 and state.running:
+                    panel.update_title(f"Python Webview Demo - Count: {state.counter}")
 
+        except KeyboardInterrupt:
+            print("\n⌨️  Keyboard interrupt detected...")
         finally:
-            print("\nCleaning up...")
-            panel.dispose()
-            print("Webview disposed!")
+            if not panel.disposed:
+                print("\nCleaning up...")
+                panel.dispose()
+            print("✅ Webview example complete!")
