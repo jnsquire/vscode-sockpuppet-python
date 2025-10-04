@@ -32,6 +32,12 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
 ]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-autorefs>=0.5.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/jnsquire/vscode-sockpuppet-python"

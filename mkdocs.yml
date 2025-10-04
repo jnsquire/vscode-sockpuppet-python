@@ -1,0 +1,120 @@
+site_name: VSCode Sockpuppet Python API
+site_description: Python client for programmatically controlling VS Code
+site_author: Joel Squire
+site_url: https://github.com/jnsquire/vscode-sockpuppet-python
+
+repo_name: jnsquire/vscode-sockpuppet-python
+repo_url: https://github.com/jnsquire/vscode-sockpuppet-python
+edit_uri: edit/main/
+
+# Source directory for documentation
+docs_dir: docs_src
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            # Docstring parsing
+            docstring_style: google
+            docstring_section_style: table
+            
+            # Display options
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            
+            # Member ordering and grouping
+            members_order: source
+            group_by_category: true
+            
+            # Signature display
+            show_signature_annotations: true
+            separate_signature: true
+            line_length: 80
+            
+            # Class handling
+            merge_init_into_class: true
+            
+            # Show all members by default
+            show_if_no_docstring: false
+            show_bases: true
+            show_inheritance_diagram: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: getting-started/quickstart.md
+    - Installation: getting-started/installation.md
+    - Examples: getting-started/examples.md
+  - API Reference:
+    - Overview: api/index.md
+    - Client: api/client.md
+    - Window: api/window.md
+    - Workspace: api/workspace.md
+    - Editor: api/editor.md
+    - Document: api/document.md
+    - Events: api/events.md
+    - Webview: api/webview.md
+    - Terminal: api/terminal.md
+    - Tabs: api/tabs.md
+    - FileSystem: api/filesystem.md
+    - Configuration: api/configuration.md
+    - Diagnostics: api/diagnostics.md
+    - Progress: api/progress.md
+    - StatusBar: api/statusbar.md
+    - FileWatcher: api/filewatcher.md
+    - Types: api/types.md
+  - Guides:
+    - Development: guides/development.md
+    - Extension Integration: guides/extension-integration.md
+    - Contributing: guides/contributing.md
+  - About:
+    - Changelog: about/changelog.md
+    - License: about/license.md
