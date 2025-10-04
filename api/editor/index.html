@@ -12,7 +12,7 @@
         <meta name="author" content="Joel Squire">
       
       
-        <link rel="canonical" href="https://github.com/jnsquire/vscode-sockpuppet-python/api/editor/">
+        <link rel="canonical" href="https://jnsquire.github.io/vscode-sockpuppet-python/api/editor/">
       
       
         <link rel="prev" href="../workspace/">
@@ -2053,7 +2053,7 @@
 
 
                   <details class="quote">
-                    <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+                    <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-86">86</a></span>
 <span class="normal"><a href="#__codelineno-0-87">87</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="s2">&quot;VSCodeClient&quot;</span><span class="p">):</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
@@ -2113,7 +2113,7 @@
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-89">89</a></span>
 <span class="normal"><a href="#__codelineno-0-90">90</a></span>
 <span class="normal"><a href="#__codelineno-0-91">91</a></span>
@@ -2143,9 +2143,7 @@
 
 
 <a href="#vscode_sockpuppet.editor.Editor.set_selection" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_selection</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_selection</span><span class="p">(</span><span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2256,7 +2254,7 @@
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
 <span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
 <span class="normal"><a href="#__codelineno-0-100">100</a></span>
@@ -2409,7 +2407,7 @@
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-121">121</a></span>
 <span class="normal"><a href="#__codelineno-0-122">122</a></span>
 <span class="normal"><a href="#__codelineno-0-123">123</a></span>
@@ -2477,9 +2475,7 @@
 
 
 <a href="#vscode_sockpuppet.editor.Editor.delete_range" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">delete_range</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">delete_range</span><span class="p">(</span><span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2590,7 +2586,7 @@
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-149">149</a></span>
 <span class="normal"><a href="#__codelineno-0-150">150</a></span>
 <span class="normal"><a href="#__codelineno-0-151">151</a></span>
@@ -2664,9 +2660,7 @@
 
 
 <a href="#vscode_sockpuppet.editor.Editor.replace_text" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">replace_text</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">replace_text</span><span class="p">(</span><span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2793,7 +2787,7 @@
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-180">180</a></span>
 <span class="normal"><a href="#__codelineno-0-181">181</a></span>
 <span class="normal"><a href="#__codelineno-0-182">182</a></span>
@@ -2885,11 +2879,7 @@
 
 
 <a href="#vscode_sockpuppet.editor.Editor.edit" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">edit</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EditBuilder</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">undo_stop_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">undo_stop_after</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">edit</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EditBuilder</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span> <span class="n">undo_stop_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">undo_stop_after</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2995,7 +2985,7 @@ be applied together in a single transaction.</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-220">220</a></span>
 <span class="normal"><a href="#__codelineno-0-221">221</a></span>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
@@ -3089,12 +3079,7 @@ be applied together in a single transaction.</p>
 
 
 <a href="#vscode_sockpuppet.editor.Editor.insert_snippet" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">insert_snippet</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">snippet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">location</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PositionType</span><span class="p">,</span> <span class="n">RangeType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">undo_stop_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">undo_stop_after</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">insert_snippet</span><span class="p">(</span><span class="n">snippet</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PositionType</span><span class="p">,</span> <span class="n">RangeType</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">undo_stop_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">undo_stop_after</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3219,7 +3204,7 @@ editor.insert_snippet("$0", location=Position(5, 0))</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
 <span class="normal"><a href="#__codelineno-0-263">263</a></span>
@@ -3367,13 +3352,7 @@ editor.insert_snippet("$0", location=Position(5, 0))</p>
 
 
 <a href="#vscode_sockpuppet.editor.Editor.reveal_range" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">reveal_range</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">reveal_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">reveal_range</span><span class="p">(</span><span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">reveal_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3512,7 +3491,7 @@ editor.insert_snippet("$0", location=Position(5, 0))</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
@@ -3649,7 +3628,7 @@ for sel in selections:
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
@@ -3773,7 +3752,7 @@ editor.set_selections([
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-386">386</a></span>
 <span class="normal"><a href="#__codelineno-0-387">387</a></span>
 <span class="normal"><a href="#__codelineno-0-388">388</a></span>
@@ -3900,7 +3879,7 @@ print(f"Insert spaces: {options['insertSpaces']}")</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
 <span class="normal"><a href="#__codelineno-0-426">426</a></span>
@@ -4011,7 +3990,7 @@ print(f"Insert spaces: {options['insertSpaces']}")</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
 <span class="normal"><a href="#__codelineno-0-440">440</a></span>
@@ -4105,7 +4084,7 @@ for r in ranges:
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-459">459</a></span>
 <span class="normal"><a href="#__codelineno-0-460">460</a></span>
 <span class="normal"><a href="#__codelineno-0-461">461</a></span>
@@ -4185,7 +4164,7 @@ print(f"Editor in column: {column}")</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-474">474</a></span>
 <span class="normal"><a href="#__codelineno-0-475">475</a></span>
 <span class="normal"><a href="#__codelineno-0-476">476</a></span>
@@ -4312,7 +4291,7 @@ editor.set_decorations(decoration, [range1, range2])</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-487">487</a></span>
 <span class="normal"><a href="#__codelineno-0-488">488</a></span>
 <span class="normal"><a href="#__codelineno-0-489">489</a></span>
@@ -4408,9 +4387,7 @@ editor.set_decorations(decoration, [range1, range2])</p>
 
 
 <a href="#vscode_sockpuppet.editor.Editor.set_decorations" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_decorations</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">decoration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DecorationType</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">ranges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RangeType</span><span class="p">]</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_decorations</span><span class="p">(</span><span class="n">decoration</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DecorationType</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">ranges</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RangeType</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4506,7 +4483,7 @@ editor.set_decorations(decoration, ranges)</p>
 </details>
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-529">529</a></span>
 <span class="normal"><a href="#__codelineno-0-530">530</a></span>
 <span class="normal"><a href="#__codelineno-0-531">531</a></span>
@@ -4631,7 +4608,7 @@ editor.set_decorations(decoration, ranges)</p>
 
 
                   <details class="quote">
-                    <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+                    <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-580">580</a></span>
 <span class="normal"><a href="#__codelineno-0-581">581</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-580" name="__codelineno-0-580"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <a id="__codelineno-0-581" name="__codelineno-0-581"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">edits</span> <span class="o">=</span> <span class="p">[]</span>
@@ -4754,7 +4731,7 @@ editor.set_decorations(decoration, ranges)</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-583">583</a></span>
 <span class="normal"><a href="#__codelineno-0-584">584</a></span>
 <span class="normal"><a href="#__codelineno-0-585">585</a></span>
@@ -4814,9 +4791,7 @@ editor.set_decorations(decoration, ranges)</p>
 
 
 <a href="#vscode_sockpuppet.editor.EditBuilder.delete" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">delete</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EditBuilder</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">delete</span><span class="p">(</span><span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EditBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4927,7 +4902,7 @@ editor.set_decorations(decoration, ranges)</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-607">607</a></span>
 <span class="normal"><a href="#__codelineno-0-608">608</a></span>
 <span class="normal"><a href="#__codelineno-0-609">609</a></span>
@@ -4991,9 +4966,7 @@ editor.set_decorations(decoration, ranges)</p>
 
 
 <a href="#vscode_sockpuppet.editor.EditBuilder.replace" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">replace</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EditBuilder</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">replace</span><span class="p">(</span><span class="n">start_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">start_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_line</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_char</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EditBuilder</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5120,7 +5093,7 @@ editor.set_decorations(decoration, ranges)</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-633">633</a></span>
 <span class="normal"><a href="#__codelineno-0-634">634</a></span>
 <span class="normal"><a href="#__codelineno-0-635">635</a></span>
@@ -5226,7 +5199,7 @@ resource when it's garbage collected, preventing resource leaks.</p>
 
 
                   <details class="quote">
-                    <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+                    <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-45">45</a></span>
 <span class="normal"><a href="#__codelineno-0-46">46</a></span>
 <span class="normal"><a href="#__codelineno-0-47">47</a></span>
@@ -5290,7 +5263,7 @@ resource when it's garbage collected, preventing resource leaks.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-50">50</a></span>
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
@@ -5343,7 +5316,7 @@ resource when it's garbage collected, preventing resource leaks.</p>
 
 
             <details class="quote">
-              <summary>Source code in <code>vscode_sockpuppet\editor.py</code></summary>
+              <summary>Source code in <code>vscode_sockpuppet/editor.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-66">66</a></span>
 <span class="normal"><a href="#__codelineno-0-67">67</a></span>
 <span class="normal"><a href="#__codelineno-0-68">68</a></span>
