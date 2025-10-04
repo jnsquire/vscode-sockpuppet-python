@@ -5,7 +5,7 @@ This example shows how to work with VS Code documents using the
 full object-oriented API that mirrors VS Code's TextDocument interface.
 """
 
-from vscode_sockpuppet import PositionDict, RangeDict, VSCodeClient
+from vscode_sockpuppet import Position, Range, VSCodeClient
 
 # Connect to VS Code
 with VSCodeClient() as vscode:
@@ -51,14 +51,14 @@ with VSCodeClient() as vscode:
     # Example 5: Work with ranges
     print("\n=== Working with Ranges ===")
     # Get text from a specific range (first line only)
-    first_line_range = RangeDict(PositionDict(0, 0), PositionDict(0, 100))
+    first_line_range = Range(Position(0, 0), Position(0, 100))
     validated_range = new_doc.validate_range(first_line_range)
     first_line_text = new_doc.get_text(validated_range)
     print(f"First line: {repr(first_line_text)}")
 
     # Example 6: Position and offset conversion
     print("\n=== Position/Offset Conversion ===")
-    pos = PositionDict(1, 0)  # Start of second line
+    pos = Position(1, 0)  # Start of second line
     offset = new_doc.offset_at(pos)
     print(f"Position {pos} is at offset {offset}")
 
@@ -68,7 +68,7 @@ with VSCodeClient() as vscode:
     # Example 7: Get word at position
     print("\n=== Word Range at Position ===")
     # Try to find a word on line 0
-    word_pos = PositionDict(0, 2)  # Inside "Hello"
+    word_pos = Position(0, 2)  # Inside "Hello"
     word_range = new_doc.get_word_range_at_position(word_pos)
     if word_range:
         word = new_doc.get_text(word_range)

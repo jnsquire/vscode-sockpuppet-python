@@ -14,7 +14,7 @@ from .diagnostics import (
     create_position,
     create_range,
 )
-from .document import TextDocument, TextLine
+from .document import Position, Range, TextDocument, TextLine
 from .editor import DecorationType, EditBuilder, Editor
 from .filewatcher import FileSystemWatcher
 from .fs import FileStat, FileSystem, FileType
@@ -115,4 +115,6 @@ __all__ = [
     "LanguageModel",
     "LanguageModelChat",
     "LanguageModelChatMessage",
+    "Range",
+    "Position",
 ]

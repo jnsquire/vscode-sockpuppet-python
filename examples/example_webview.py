@@ -112,52 +112,52 @@ with VSCodeClient() as client:
     # Create webview with JavaScript enabled
     options = WebviewOptions(enable_scripts=True, retain_context_when_hidden=True)
 
-    panel = client.window.create_webview_panel(
+    with client.window.create_webview_panel(
         title="Python Webview Demo", html=html_content, options=options
-    )
+    ) as panel:
+        print(f"Created webview panel: {panel.id}")
 
-    print(f"Created webview panel: {panel.id}")
+        # Subscribe to messages from the webview using the panel method
+        def handle_message(message):
+            print(f"Message from webview: {message}")
+            action = message.get("action")
 
-    # Subscribe to messages from the webview using the panel method
-    def handle_message(message):
-        action = message.get("action")
+            print(f"Received message from webview: {action}")
 
-        print(f"Received message from webview: {action}")
+            if action == "increment":
+                # Send counter update to webview
+                panel.post_message({"type": "updateCounter", "value": int(time.time()) % 100})
+            elif action == "reset":
+                panel.post_message({"type": "updateCounter", "value": 0})
+            elif action == "hello":
+                panel.post_message(
+                    {
+                        "type": "showMessage",
+                        "text": f"Hello from Python! Time: {time.strftime('%H:%M:%S')}",
+                    }
+                )
 
-        if action == "increment":
-            # Send counter update to webview
-            panel.post_message({"type": "updateCounter", "value": int(time.time()) % 100})
-        elif action == "reset":
-            panel.post_message({"type": "updateCounter", "value": 0})
-        elif action == "hello":
-            panel.post_message(
-                {
-                    "type": "showMessage",
-                    "text": f"Hello from Python! Time: {time.strftime('%H:%M:%S')}",
-                }
-            )
+        # Subscribe using the panel's method
+        unsubscribe = panel.on_did_receive_message(handle_message)
 
-    # Subscribe using the panel's method
-    unsubscribe = panel.on_did_receive_message(handle_message)
+        # Update the webview periodically
+        print("Webview is running. Try clicking the buttons!")
+        print("Press Ctrl+C to exit...")
 
-    # Update the webview periodically
-    print("Webview is running. Try clicking the buttons!")
-    print("Press Ctrl+C to exit...")
+        try:
+            counter = 0
+            while True:
+                time.sleep(3)
+                counter += 1
 
-    try:
-        counter = 0
-        while True:
-            time.sleep(3)
-            counter += 1
+                # Update the counter from Python
+                panel.post_message({"type": "updateCounter", "value": counter})
 
-            # Update the counter from Python
-            panel.post_message({"type": "updateCounter", "value": counter})
+                # Every 10 seconds, update the title
+                if counter % 10 == 0:
+                    panel.update_title(f"Python Webview Demo - Count: {counter}")
 
-            # Every 10 seconds, update the title
-            if counter % 10 == 0:
-                panel.update_title(f"Python Webview Demo - Count: {counter}")
-
-    except KeyboardInterrupt:
-        print("\nCleaning up...")
-        panel.dispose()
-        print("Webview disposed!")
+        finally:
+            print("\nCleaning up...")
+            panel.dispose()
+            print("Webview disposed!")
