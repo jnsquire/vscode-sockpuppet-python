@@ -2,11 +2,21 @@
 Workspace operations for VS Code
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional
 
 from .configuration import WorkspaceConfiguration
 from .document import TextDocument
-from .events import WorkspaceEvents
+from .events import (
+    ConfigurationChangeEvent,
+    DidChangeTextDocumentEvent,
+    Event,
+    FileOperationEvent,
+    TextDocumentDict,
+    WorkspaceEvents,
+    WorkspaceFoldersChangeEvent,
+)
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
@@ -216,6 +226,38 @@ class Workspace:
         self.client = client
         self._events = WorkspaceEvents(client)
         self._env: Optional[Environment] = None
+        # Instantiate Event objects here so they are discoverable from the
+        # workspace namespace (e.g. client.workspace.on_did_save_text_document)
+        # We store them on private attributes and have the public properties
+        # return these instances to maintain the existing property API.
+        # Use specific TypedDicts for event payloads to improve type safety.
+        self._on_did_open_text_document: Event[TextDocumentDict] = Event(
+            self.client, "workspace.onDidOpenTextDocument"
+        )
+        self._on_did_close_text_document: Event[TextDocumentDict] = Event(
+            self.client, "workspace.onDidCloseTextDocument"
+        )
+        self._on_did_save_text_document: Event[TextDocumentDict] = Event(
+            self.client, "workspace.onDidSaveTextDocument"
+        )
+        self._on_did_change_text_document: Event[DidChangeTextDocumentEvent] = Event(
+            self.client, "workspace.onDidChangeTextDocument"
+        )
+        self._on_did_change_workspace_folders: Event[WorkspaceFoldersChangeEvent] = Event(
+            self.client, "workspace.onDidChangeWorkspaceFolders"
+        )
+        self._on_did_change_configuration: Event[ConfigurationChangeEvent] = Event(
+            self.client, "workspace.onDidChangeConfiguration"
+        )
+        self._on_did_create_files: Event[FileOperationEvent] = Event(
+            self.client, "workspace.onDidCreateFiles"
+        )
+        self._on_did_delete_files: Event[FileOperationEvent] = Event(
+            self.client, "workspace.onDidDeleteFiles"
+        )
+        self._on_did_rename_files: Event[FileOperationEvent] = Event(
+            self.client, "workspace.onDidRenameFiles"
+        )
 
     @property
     def env(self) -> Environment:
@@ -236,49 +278,49 @@ class Workspace:
 
     # Event subscriptions (VS Code-style API)
     @property
-    def on_did_open_text_document(self):
+    def on_did_open_text_document(self) -> Event[TextDocumentDict]:
         """Event fired when a text document is opened."""
-        return self._events.on_did_open_text_document
+        return self._on_did_open_text_document
 
     @property
-    def on_did_close_text_document(self):
+    def on_did_close_text_document(self) -> Event[TextDocumentDict]:
         """Event fired when a text document is closed."""
-        return self._events.on_did_close_text_document
+        return self._on_did_close_text_document
 
     @property
-    def on_did_save_text_document(self):
+    def on_did_save_text_document(self) -> Event[TextDocumentDict]:
         """Event fired when a text document is saved."""
-        return self._events.on_did_save_text_document
+        return self._on_did_save_text_document
 
     @property
-    def on_did_change_text_document(self):
+    def on_did_change_text_document(self) -> Event[DidChangeTextDocumentEvent]:
         """Event fired when a text document changes."""
-        return self._events.on_did_change_text_document
+        return self._on_did_change_text_document
 
     @property
-    def on_did_change_workspace_folders(self):
+    def on_did_change_workspace_folders(self) -> Event[WorkspaceFoldersChangeEvent]:
         """Event fired when workspace folders are added or removed."""
-        return self._events.on_did_change_workspace_folders
+        return self._on_did_change_workspace_folders
 
     @property
-    def on_did_change_configuration(self):
+    def on_did_change_configuration(self) -> Event[ConfigurationChangeEvent]:
         """Event fired when the configuration changes."""
-        return self._events.on_did_change_configuration
+        return self._on_did_change_configuration
 
     @property
-    def on_did_create_files(self):
+    def on_did_create_files(self) -> Event[FileOperationEvent]:
         """Event fired when files are created."""
-        return self._events.on_did_create_files
+        return self._on_did_create_files
 
     @property
-    def on_did_delete_files(self):
+    def on_did_delete_files(self) -> Event[FileOperationEvent]:
         """Event fired when files are deleted."""
-        return self._events.on_did_delete_files
+        return self._on_did_delete_files
 
     @property
-    def on_did_rename_files(self):
+    def on_did_rename_files(self) -> Event[FileOperationEvent]:
         """Event fired when files are renamed or moved."""
-        return self._events.on_did_rename_files
+        return self._on_did_rename_files
 
     def open_text_document(
         self,

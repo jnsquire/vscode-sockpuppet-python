@@ -350,3 +350,179 @@ def test_subprocess_view_state_event_routes_to_handler():
     finally:
         _cleanup_client(client)
         _cleanup_host(host_proc, port_queue)
+
+
+def test_subprocess_workspace_change_text_document_routes_to_handler():
+    script = {
+        "workspace.onDidChangeTextDocument": [
+            {
+                "data": {
+                    "uri": "file:///test/file.py",
+                    "contentChanges": [
+                        {
+                            "range": {
+                                "start": {"line": 0, "character": 0},
+                                "end": {"line": 0, "character": 1},
+                            },
+                            "text": "x",
+                        }
+                    ],
+                },
+                "delay": 0.05,
+            }
+        ]
+    }
+
+    client, host_proc, port_queue = _start_client_and_host(script)
+    allow_event_loop_start = _prepare_event_loop(client)
+
+    received: list[dict] = []
+    unsubscribe = client.workspace.on_did_change_text_document(lambda payload: received.append(payload))
+
+    delivered = threading.Event()
+
+    def session_listener(state: str, payload: Dict[str, Any]) -> None:
+        if state != "event-dispatched":
+            return
+        if payload.get("event") != "workspace.onDidChangeTextDocument":
+            return
+        if received:
+            delivered.set()
+
+    with client.session_listener(session_listener):
+        allow_event_loop_start.set()
+        assert delivered.wait(timeout=1.0)
+
+    try:
+        assert (
+            received
+            == [
+                {
+                    "uri": "file:///test/file.py",
+                    "contentChanges": [
+                        {
+                            "range": {
+                                "start": {"line": 0, "character": 0},
+                                "end": {"line": 0, "character": 1},
+                            },
+                            "text": "x",
+                        }
+                    ],
+                }
+            ]
+        )
+    finally:
+        try:
+            unsubscribe()
+        except Exception:
+            pass
+        _cleanup_client(client)
+        _cleanup_host(host_proc, port_queue)
+
+
+def test_subprocess_window_on_did_open_terminal_routes_to_handler():
+    script = {
+        "window.onDidOpenTerminal": [
+            {"data": {"name": "test-terminal"}, "delay": 0.05}
+        ]
+    }
+
+    client, host_proc, port_queue = _start_client_and_host(script)
+    allow_event_loop_start = _prepare_event_loop(client)
+
+    received: list[dict] = []
+    unsubscribe = client.window.on_did_open_terminal(lambda payload: received.append(payload))
+
+    delivered = threading.Event()
+
+    def session_listener(state: str, payload: Dict[str, Any]) -> None:
+        if state != "event-dispatched":
+            return
+        if payload.get("event") != "window.onDidOpenTerminal":
+            return
+        if received:
+            delivered.set()
+
+    with client.session_listener(session_listener):
+        allow_event_loop_start.set()
+        assert delivered.wait(timeout=1.0)
+
+    try:
+        assert received == [{"name": "test-terminal"}]
+    finally:
+        try:
+            unsubscribe()
+        except Exception:
+            pass
+        _cleanup_client(client)
+        _cleanup_host(host_proc, port_queue)
+
+
+def _run_single_event_test(event_name: str, payload: dict):
+    script = {event_name: [{"data": payload}]}
+
+    client, host_proc, port_queue = _start_client_and_host(script)
+    allow_event_loop_start = _prepare_event_loop(client)
+
+    received: list[dict] = []
+    unsub = client.add_event_listener(event_name, lambda p: received.append(p))
+
+    delivered = threading.Event()
+
+    def session_listener(state: str, payload: Dict[str, Any]) -> None:
+        if state != "event-dispatched":
+            return
+        if payload.get("event") == event_name and received:
+            delivered.set()
+
+    with client.session_listener(session_listener):
+        allow_event_loop_start.set()
+        assert delivered.wait(timeout=1.0)
+
+    try:
+        time.sleep(0.02)
+        assert received == [payload]
+    finally:
+        try:
+            unsub()
+        except Exception:
+            pass
+        _cleanup_client(client)
+        _cleanup_host(host_proc, port_queue)
+
+
+def test_subprocess_watcher_on_create_routes_to_handler():
+    _run_single_event_test("watcher.testwatcher.onCreate", {"uri": "file:///watched/new.txt"})
+
+
+def test_subprocess_watcher_on_change_routes_to_handler():
+    _run_single_event_test("watcher.testwatcher.onChange", {"uri": "file:///watched/new.txt"})
+
+
+def test_subprocess_watcher_on_delete_routes_to_handler():
+    _run_single_event_test("watcher.testwatcher.onDelete", {"uri": "file:///watched/new.txt"})
+
+
+
+def test_subprocess_workspace_on_did_create_files_routes_to_handler():
+    _run_single_event_test("workspace.onDidCreateFiles", {"files": [{"uri": "file:///a.txt"}]})
+
+
+def test_subprocess_workspace_on_did_delete_files_routes_to_handler():
+    _run_single_event_test("workspace.onDidDeleteFiles", {"files": [{"uri": "file:///b.txt"}]})
+
+
+def test_subprocess_workspace_on_did_rename_files_routes_to_handler():
+    _run_single_event_test(
+        "workspace.onDidRenameFiles",
+        {"files": [{"oldUri": "file:///c_old.txt", "newUri": "file:///c_new.txt"}]},
+    )
+
+
+
+def test_subprocess_window_on_did_change_tab_groups_routes_to_handler():
+    _run_single_event_test("window.onDidChangeTabGroups", {"opened": 1, "closed": 0, "changed": 0})
+
+
+def test_subprocess_window_on_did_change_tabs_routes_to_handler():
+    _run_single_event_test("window.onDidChangeTabs", {"opened": 0, "closed": 1, "changed": 0})

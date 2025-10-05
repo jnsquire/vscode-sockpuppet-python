@@ -8,7 +8,7 @@ import socket
 import tempfile
 import threading
 from contextlib import contextmanager
-from typing import Any, Callable, Dict, Literal, Optional, Union, overload
+from typing import Any, Callable, Dict, Optional, Union
 
 from .diagnostics import Languages
 from .editor import Editor
@@ -213,90 +213,26 @@ class VSCodeClient:
         """
         return self._send_request("commands.getCommands", {"filterInternal": filter_internal})
 
-    # Strongly-typed subscribe overloads for common events
-    @overload
-    def subscribe(
-        self,
-        event: Literal["webview.onDidReceiveMessage"],
-        handler: Callable[[Dict[str, Any]], None],
-    ) -> None:  # pragma: no cover - typing only
-        ...
+    def add_event_listener(self, event: str, handler: Callable[[Any], None]) -> Callable[[], None]:
+        """Register a handler for a server-sent event and return an unsubscribe callable.
 
-    @overload
-    def subscribe(
-        self, event: Literal["webview.onDidDispose"], handler: Callable[[Dict[str, Any]], None]
-    ) -> None:  # pragma: no cover - typing only
-        ...
-
-    @overload
-    def subscribe(
-        self,
-        event: Literal["webview.onDidChangeViewState"],
-        handler: Callable[[Dict[str, Any]], None],
-    ) -> None:  # pragma: no cover - typing only
-        ...
-
-    @overload
-    def subscribe(
-        self, event: str, handler: Callable[[Any], None]
-    ) -> None:  # pragma: no cover - typing only
-        ...
-
-    def subscribe(self, event: str, handler: Callable[[Any], None]) -> None:
+        This replaces the old `subscribe()` API. The first listener for an event
+        will trigger a server-side subscription (`events.subscribe`) and the last
+        listener removed will trigger `events.unsubscribe`.
         """
-        Subscribe to a VS Code event.
-
-        Args:
-            event: Event name (e.g., 'workspace.onDidSaveTextDocument')
-            handler: Callback function to handle the event data
-
-        Available events:
-            - workspace.onDidOpenTextDocument
-            - workspace.onDidCloseTextDocument
-            - workspace.onDidSaveTextDocument
-            - workspace.onDidChangeTextDocument
-            - window.onDidChangeActiveTextEditor
-            - window.onDidChangeTextEditorSelection
-            - window.onDidChangeVisibleTextEditors
-            - window.onDidOpenTerminal
-            - window.onDidCloseTerminal
-            - workspace.onDidChangeWorkspaceFolders
-            - workspace.onDidChangeConfiguration
-        """
-        # Start event listener thread if not running
+        # Ensure the background event loop is running
         if not self._running and self._event_thread is None:
             self._running = True
             self._event_thread = threading.Thread(target=self._event_loop, daemon=True)
             self._event_thread.start()
 
-        if event not in self._emitters:
-            # create emitter that subscribes/unsubscribes on first add / last remove
-            def _on_first_add() -> None:
-                try:
-                    self._send_request("events.subscribe", {"event": event})
-                finally:
-                    self._notify_session_listeners("subscription-ack", {"event": event})
+        emitter = self.get_emitter(event)
+        return emitter.event(handler)
 
-            def _on_no_listeners() -> None:
-                try:
-                    self._send_request("events.unsubscribe", {"event": event})
-                finally:
-                    self._notify_session_listeners("unsubscription-ack", {"event": event})
+    def remove_event_listener(self, event: str, handler: Optional[Callable] = None) -> None:
+        """Remove a previously registered event handler or all handlers for an event.
 
-            self._emitters[event] = EventEmitter(
-                on_first_add=_on_first_add, on_no_listeners=_on_no_listeners
-            )
-
-        # register handler
-        self._emitters[event].event(handler)
-
-    def unsubscribe(self, event: str, handler: Optional[Callable] = None) -> None:
-        """
-        Unsubscribe from a VS Code event.
-
-        Args:
-            event: Event name
-            handler: Specific handler to remove, or None to remove all
+        If handler is None, explicitly unsubscribe from the server and remove the emitter.
         """
         if event not in self._emitters:
             return
@@ -325,6 +261,33 @@ class VSCodeClient:
             List of event names
         """
         return self._send_request("events.listSubscriptions")
+
+    def get_emitter(self, event: str) -> EventEmitter:
+        """Return the EventEmitter for a named event, creating it if necessary.
+
+        This allows callers to access the per-event emitter when they need to
+        inspect or interact with listeners directly. It preserves the same
+        on_first_add/on_no_listeners hook behavior as before.
+        """
+        if event not in self._emitters:
+
+            def _on_first_add() -> None:
+                try:
+                    self._send_request("events.subscribe", {"event": event})
+                finally:
+                    self._notify_session_listeners("subscription-ack", {"event": event})
+
+            def _on_no_listeners() -> None:
+                try:
+                    self._send_request("events.unsubscribe", {"event": event})
+                finally:
+                    self._notify_session_listeners("unsubscription-ack", {"event": event})
+
+            self._emitters[event] = EventEmitter(
+                on_first_add=_on_first_add, on_no_listeners=_on_no_listeners
+            )
+
+        return self._emitters[event]
 
     def _event_loop(self) -> None:
         """Background thread that listens for events from VS Code."""
@@ -438,13 +401,12 @@ class VSCodeClient:
                 ...
         """
 
-        # Subscribe and yield control to the caller
-        self.subscribe(event, handler)
+        # Register the handler and ensure we remove it when the context exits.
+        unsubscribe = self.add_event_listener(event, handler)
         try:
             yield handler
         finally:
-            # Best-effort unsubscribe
             try:
-                self.unsubscribe(event, handler)
+                unsubscribe()
             except Exception:
                 pass

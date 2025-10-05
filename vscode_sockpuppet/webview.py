@@ -4,6 +4,8 @@ Webview API for creating and managing VS Code webview panels.
 
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
 
+from .events import WebviewMessageEvent, WebviewViewStateEvent
+
 if TYPE_CHECKING:
     from .client import VSCodeClient
 
@@ -15,7 +17,7 @@ if TYPE_CHECKING:
 # _global_message_registry: client -> { panel_id: WebviewPanel }
 _global_message_registry: Dict["VSCodeClient", Dict[str, "WebviewPanel"]] = {}
 # _global_message_handler_ref: client -> handler callable (so we can unsubscribe)
-_global_message_handler_ref: Dict["VSCodeClient", Callable[[Any], None]] = {}
+_global_message_handler_ref: Dict["VSCodeClient", Callable[[], None]] = {}
 
 
 def _unregister_panel_from_global(client: "VSCodeClient", panel_id: str) -> None:
@@ -39,9 +41,9 @@ def _unregister_panel_from_global(client: "VSCodeClient", panel_id: str) -> None
             handler = _global_message_handler_ref.pop(client, None)
             if handler is not None:
                 try:
-                    client.unsubscribe("webview.onDidReceiveMessage", handler)
+                    # handler here is the unsubscribe callable
+                    handler()
                 except Exception:
-                    # Best effort; ignore errors during cleanup
                     pass
     except Exception as e:
         print(f"Error unregistering webview panel from global registry: {e}")
@@ -49,7 +51,7 @@ def _unregister_panel_from_global(client: "VSCodeClient", panel_id: str) -> None
 
 # Dispose event global registries
 _global_dispose_registry: Dict["VSCodeClient", Dict[str, "WebviewPanel"]] = {}
-_global_dispose_handler_ref: Dict["VSCodeClient", Callable[[Any], None]] = {}
+_global_dispose_handler_ref: Dict["VSCodeClient", Callable[[], None]] = {}
 
 
 def _unregister_dispose_panel_from_global(client: "VSCodeClient", panel_id: str) -> None:
@@ -69,7 +71,7 @@ def _unregister_dispose_panel_from_global(client: "VSCodeClient", panel_id: str)
             handler = _global_dispose_handler_ref.pop(client, None)
             if handler is not None:
                 try:
-                    client.unsubscribe("webview.onDidDispose", handler)
+                    handler()
                 except Exception:
                     pass
     except Exception as e:
@@ -78,7 +80,7 @@ def _unregister_dispose_panel_from_global(client: "VSCodeClient", panel_id: str)
 
 # View state event global registries
 _global_viewstate_registry: Dict["VSCodeClient", Dict[str, "WebviewPanel"]] = {}
-_global_viewstate_handler_ref: Dict["VSCodeClient", Callable[[Any], None]] = {}
+_global_viewstate_handler_ref: Dict["VSCodeClient", Callable[[], None]] = {}
 
 
 def _unregister_viewstate_panel_from_global(client: "VSCodeClient", panel_id: str) -> None:
@@ -98,7 +100,7 @@ def _unregister_viewstate_panel_from_global(client: "VSCodeClient", panel_id: st
             handler = _global_viewstate_handler_ref.pop(client, None)
             if handler is not None:
                 try:
-                    client.unsubscribe("webview.onDidChangeViewState", handler)
+                    handler()
                 except Exception:
                     pass
     except Exception as e:
@@ -127,9 +129,12 @@ class WebviewPanel:
         self._view_type = view_type
         self._title = title
         self._disposed = False
+        # Panel-level message handlers receive the 'message' payload (Any)
         self._message_handlers: list[Callable[[Any], None]] = []
+        # Dispose handlers receive no arguments
         self._dispose_handlers: list[Callable[[], None]] = []
-        self._view_state_handlers: list[Callable[[dict], None]] = []
+        # View state handlers receive the small state dict
+        self._view_state_handlers: list[Callable[[WebviewViewStateEvent], None]] = []
         self._subscription_active = False
         self._dispose_subscription_active = False
         self._view_state_subscription_active = False
@@ -432,7 +437,7 @@ class WebviewPanel:
         # create and subscribe it.
         if client not in _global_message_handler_ref:
 
-            def _global_handler(event):
+            def _global_handler(event: WebviewMessageEvent):
                 # event expected to be a dict with 'id' and 'message'
                 try:
                     panel_id = event.get("id")
@@ -454,8 +459,10 @@ class WebviewPanel:
                     print(f"Error in global webview message dispatch: {e}")
 
             # keep reference so we can unsubscribe later if needed
-            _global_message_handler_ref[client] = _global_handler
-            client.subscribe("webview.onDidReceiveMessage", _global_handler)
+            # store unsubscribe callable returned by client.add_event_listener
+            _global_message_handler_ref[client] = client.add_event_listener(
+                "webview.onDidReceiveMessage", _global_handler
+            )
 
     def _setup_dispose_subscription(self) -> None:
         """Register this panel with a global dispose dispatcher for the client."""
@@ -488,8 +495,9 @@ class WebviewPanel:
                 except Exception as e:
                     print(f"Error in global webview dispose dispatch: {e}")
 
-            _global_dispose_handler_ref[client] = _global_dispose_handler
-            client.subscribe("webview.onDidDispose", _global_dispose_handler)
+            _global_dispose_handler_ref[client] = client.add_event_listener(
+                "webview.onDidDispose", _global_dispose_handler
+            )
 
     def _setup_view_state_subscription(self) -> None:
         """Register this panel with a global view-state dispatcher for the client."""
@@ -523,8 +531,9 @@ class WebviewPanel:
                 except Exception as e:
                     print(f"Error in global webview viewstate dispatch: {e}")
 
-            _global_viewstate_handler_ref[client] = _global_viewstate_handler
-            client.subscribe("webview.onDidChangeViewState", _global_viewstate_handler)
+            _global_viewstate_handler_ref[client] = client.add_event_listener(
+                "webview.onDidChangeViewState", _global_viewstate_handler
+            )
 
     def dispose(self) -> None:
         """

@@ -2,7 +2,9 @@
 Tab Groups API for VS Code
 """
 
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Callable, Optional
+
+from .events import TabGroupsChangeEvent, TabsChangeEvent
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
@@ -178,7 +180,7 @@ class TabGroups:
 
     def on_did_change_tab_groups(
         self,
-        handler: Callable[[Any], None],
+        handler: Callable[[TabGroupsChangeEvent], None],
     ) -> Callable[[], None]:
         """
         Subscribe to tab group changes.
@@ -201,16 +203,12 @@ class TabGroups:
             # Later: dispose()
         """
         event_name = "window.onDidChangeTabGroups"
-        self.client.subscribe(event_name, handler)
-
-        def dispose():
-            self.client.unsubscribe(event_name, handler)
-
-        return dispose
+        unsubscribe = self.client.add_event_listener(event_name, handler)
+        return unsubscribe
 
     def on_did_change_tabs(
         self,
-        handler: Callable[[Any], None],
+        handler: Callable[[TabsChangeEvent], None],
     ) -> Callable[[], None]:
         """
         Subscribe to tab changes.
@@ -232,9 +230,5 @@ class TabGroups:
             # Later: dispose()
         """
         event_name = "window.onDidChangeTabs"
-        self.client.subscribe(event_name, handler)
-
-        def dispose():
-            self.client.unsubscribe(event_name, handler)
-
-        return dispose
+        unsubscribe = self.client.add_event_listener(event_name, handler)
+        return unsubscribe

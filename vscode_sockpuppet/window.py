@@ -1,11 +1,35 @@
 """
-Window operations for VS Code
+Windfrom .events import (
+    Event,
+    TerminalEvent,
+    TerminalStateEvent,
+    TextEditorOptionsEvent,
+    TextEditorSelectionEvent,
+    TextEditorViewColumnEvent,
+    TextEditorVisibleRangesEvent,
+    VisibleTextEditorsEvent,
+    WindowEvents,
+    WindowStateEvent,
+)s for VS Code
 """
+
+from __future__ import annotations
 
 import uuid
 from typing import TYPE_CHECKING, Optional
 
-from .events import WindowEvents
+from .events import (
+    WindowEvents,
+    Event,
+    WindowStateEvent,
+    TextEditorSelectionEvent,
+    VisibleTextEditorsEvent,
+    TextEditorVisibleRangesEvent,
+    TerminalEvent,
+    TerminalStateEvent,
+        TextEditorOptionsEvent,
+        TextEditorViewColumnEvent,
+)
 from .window_types import (
     InputBoxOptions,
     OpenDialogOptions,
@@ -29,6 +53,33 @@ class Window:
         self.client = client
         self._events = WindowEvents(client)
         self._tab_groups: Optional[TabGroups] = None
+        # Expose strongly-typed Event objects on the Window namespace.
+        self._on_did_change_active_text_editor: Event[TextEditorSelectionEvent] = Event(
+            self.client, "window.onDidChangeActiveTextEditor"
+        )
+        self._on_did_change_text_editor_selection: Event[TextEditorSelectionEvent] = Event(
+            self.client, "window.onDidChangeTextEditorSelection"
+        )
+        self._on_did_change_visible_text_editors: Event[VisibleTextEditorsEvent] = Event(
+            self.client, "window.onDidChangeVisibleTextEditors"
+        )
+        self._on_did_open_terminal: Event[TerminalEvent] = Event(self.client, "window.onDidOpenTerminal")
+        self._on_did_close_terminal: Event[TerminalEvent] = Event(self.client, "window.onDidCloseTerminal")
+        self._on_did_change_terminal_state: Event[TerminalStateEvent] = Event(
+            self.client, "window.onDidChangeTerminalState"
+        )
+        self._on_did_change_text_editor_visible_ranges: Event[TextEditorVisibleRangesEvent] = Event(
+            self.client, "window.onDidChangeTextEditorVisibleRanges"
+        )
+        self._on_did_change_text_editor_options: Event[TextEditorOptionsEvent] = Event(
+            self.client, "window.onDidChangeTextEditorOptions"
+        )
+        self._on_did_change_text_editor_view_column: Event[TextEditorViewColumnEvent] = Event(
+            self.client, "window.onDidChangeTextEditorViewColumn"
+        )
+        self._on_did_change_window_state: Event[WindowStateEvent] = Event(
+            self.client, "window.onDidChangeWindowState"
+        )
 
     # Event subscriptions (VS Code-style API)
     @property
@@ -41,54 +92,54 @@ class Window:
         return self._tab_groups
 
     @property
-    def on_did_change_active_text_editor(self):
+    def on_did_change_active_text_editor(self) -> Event[TextEditorSelectionEvent]:
         """Event fired when the active text editor changes."""
-        return self._events.on_did_change_active_text_editor
+        return self._on_did_change_active_text_editor
 
     @property
-    def on_did_change_text_editor_selection(self):
+    def on_did_change_text_editor_selection(self) -> Event[TextEditorSelectionEvent]:
         """Event fired when the selection in an editor changes."""
-        return self._events.on_did_change_text_editor_selection
+        return self._on_did_change_text_editor_selection
 
     @property
-    def on_did_change_visible_text_editors(self):
+    def on_did_change_visible_text_editors(self) -> Event[VisibleTextEditorsEvent]:
         """Event fired when the visible text editors change."""
-        return self._events.on_did_change_visible_text_editors
+        return self._on_did_change_visible_text_editors
 
     @property
-    def on_did_open_terminal(self):
+    def on_did_open_terminal(self) -> Event[TerminalEvent]:
         """Event fired when a terminal is opened."""
-        return self._events.on_did_open_terminal
+        return self._on_did_open_terminal
 
     @property
-    def on_did_close_terminal(self):
+    def on_did_close_terminal(self) -> Event[TerminalEvent]:
         """Event fired when a terminal is closed."""
-        return self._events.on_did_close_terminal
+        return self._on_did_close_terminal
 
     @property
-    def on_did_change_terminal_state(self):
+    def on_did_change_terminal_state(self) -> Event[TerminalStateEvent]:
         """Event fired when a terminal's state changes."""
-        return self._events.on_did_change_terminal_state
+        return self._on_did_change_terminal_state
 
     @property
-    def on_did_change_text_editor_visible_ranges(self):
+    def on_did_change_text_editor_visible_ranges(self) -> Event[TextEditorVisibleRangesEvent]:
         """Event fired when visible ranges in an editor change."""
-        return self._events.on_did_change_text_editor_visible_ranges
+        return self._on_did_change_text_editor_visible_ranges
 
     @property
-    def on_did_change_text_editor_options(self):
+    def on_did_change_text_editor_options(self) -> Event[dict]:
         """Event fired when text editor options change."""
-        return self._events.on_did_change_text_editor_options
+        return self._on_did_change_text_editor_options
 
     @property
-    def on_did_change_text_editor_view_column(self):
+    def on_did_change_text_editor_view_column(self) -> Event[dict]:
         """Event fired when an editor's view column changes."""
-        return self._events.on_did_change_text_editor_view_column
+        return self._on_did_change_text_editor_view_column
 
     @property
-    def on_did_change_window_state(self):
+    def on_did_change_window_state(self) -> Event[WindowStateEvent]:
         """Event fired when the window state changes (focus)."""
-        return self._events.on_did_change_window_state
+        return self._on_did_change_window_state
 
     def show_information_message(self, message: str, *items: str) -> Optional[str]:
         """

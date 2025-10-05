@@ -56,15 +56,15 @@ def main():
             "Event subscription example started! Try opening/saving/editing files."
         )
 
-        # Subscribe to various events
+        # Subscribe to various events using the new per-event API on workspace/window
         print("Subscribing to events...")
 
-        vscode.subscribe("workspace.onDidSaveTextDocument", on_file_saved)
-        vscode.subscribe("workspace.onDidOpenTextDocument", on_file_opened)
-        vscode.subscribe("workspace.onDidChangeTextDocument", on_file_changed)
-        vscode.subscribe("window.onDidChangeTextEditorSelection", on_selection_changed)
-        vscode.subscribe("window.onDidOpenTerminal", on_terminal_opened)
-        vscode.subscribe("window.onDidChangeActiveTextEditor", on_active_editor_changed)
+        vscode.workspace.on_did_save_text_document(on_file_saved)
+        vscode.workspace.on_did_open_text_document(on_file_opened)
+        vscode.workspace.on_did_change_text_document(on_file_changed)
+        vscode.window.on_did_change_text_editor_selection(on_selection_changed)
+        vscode.window.on_did_open_terminal(on_terminal_opened)
+        vscode.window.on_did_change_active_text_editor(on_active_editor_changed)
 
         # Show subscribed events
         subscriptions = vscode.get_subscriptions()

@@ -4,6 +4,8 @@ File System Watcher for VS Code workspace
 
 from typing import TYPE_CHECKING, Callable
 
+from .events import FileWatcherEvent
+
 if TYPE_CHECKING:
     from .client import VSCodeClient
 
@@ -43,26 +45,30 @@ class FileSystemWatcher:
         self.ignore_change_events = ignore_change_events
         self.ignore_delete_events = ignore_delete_events
         self._disposed = False
-
         # Event handler callbacks
         self._on_create_handlers: list[Callable[[str], None]] = []
         self._on_change_handlers: list[Callable[[str], None]] = []
         self._on_delete_handlers: list[Callable[[str], None]] = []
 
-        # Subscribe to watcher events
-        if not ignore_create_events:
-            event_name = f"watcher.{watcher_id}.onCreate"
-            self.client.subscribe(event_name, self._handle_create)
+        # Subscribe to watcher events and keep unsubscribe callables so we
+        # can remove them during dispose.
+        self._unsub_create = None
+        self._unsub_change = None
+        self._unsub_delete = None
 
-        if not ignore_change_events:
-            event_name = f"watcher.{watcher_id}.onChange"
-            self.client.subscribe(event_name, self._handle_change)
+        if not self.ignore_create_events:
+            event_name = f"watcher.{self.watcher_id}.onCreate"
+            self._unsub_create = self.client.add_event_listener(event_name, self._handle_create)
 
-        if not ignore_delete_events:
-            event_name = f"watcher.{watcher_id}.onDelete"
-            self.client.subscribe(event_name, self._handle_delete)
+        if not self.ignore_change_events:
+            event_name = f"watcher.{self.watcher_id}.onChange"
+            self._unsub_change = self.client.add_event_listener(event_name, self._handle_change)
 
-    def _handle_create(self, data: dict) -> None:
+        if not self.ignore_delete_events:
+            event_name = f"watcher.{self.watcher_id}.onDelete"
+            self._unsub_delete = self.client.add_event_listener(event_name, self._handle_delete)
+
+    def _handle_create(self, data: FileWatcherEvent) -> None:
         """Handle file creation events."""
         uri = data.get("uri", "")
         for handler in self._on_create_handlers:
@@ -71,7 +77,7 @@ class FileSystemWatcher:
             except Exception as e:
                 print(f"Error in onCreate handler: {e}")
 
-    def _handle_change(self, data: dict) -> None:
+    def _handle_change(self, data: FileWatcherEvent) -> None:
         """Handle file change events."""
         uri = data.get("uri", "")
         for handler in self._on_change_handlers:
@@ -80,7 +86,7 @@ class FileSystemWatcher:
             except Exception as e:
                 print(f"Error in onChange handler: {e}")
 
-    def _handle_delete(self, data: dict) -> None:
+    def _handle_delete(self, data: FileWatcherEvent) -> None:
         """Handle file deletion events."""
         uri = data.get("uri", "")
         for handler in self._on_delete_handlers:
@@ -194,6 +200,23 @@ class FileSystemWatcher:
         self._on_create_handlers.clear()
         self._on_change_handlers.clear()
         self._on_delete_handlers.clear()
+
+        # Unsubscribe any registered event listeners
+        try:
+            if getattr(self, "_unsub_create", None):
+                self._unsub_create()
+        except Exception:
+            pass
+        try:
+            if getattr(self, "_unsub_change", None):
+                self._unsub_change()
+        except Exception:
+            pass
+        try:
+            if getattr(self, "_unsub_delete", None):
+                self._unsub_delete()
+        except Exception:
+            pass
 
         # Notify server to dispose watcher
         self.client._send_request(
