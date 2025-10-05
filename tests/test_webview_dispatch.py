@@ -377,7 +377,9 @@ def test_subprocess_workspace_change_text_document_routes_to_handler():
     allow_event_loop_start = _prepare_event_loop(client)
 
     received: list[dict] = []
-    unsubscribe = client.workspace.on_did_change_text_document(lambda payload: received.append(payload))
+    unsubscribe = client.workspace.on_did_change_text_document(
+        lambda payload: received.append(payload)
+    )
 
     delivered = threading.Event()
 
@@ -394,23 +396,20 @@ def test_subprocess_workspace_change_text_document_routes_to_handler():
         assert delivered.wait(timeout=1.0)
 
     try:
-        assert (
-            received
-            == [
-                {
-                    "uri": "file:///test/file.py",
-                    "contentChanges": [
-                        {
-                            "range": {
-                                "start": {"line": 0, "character": 0},
-                                "end": {"line": 0, "character": 1},
-                            },
-                            "text": "x",
-                        }
-                    ],
-                }
-            ]
-        )
+        assert received == [
+            {
+                "uri": "file:///test/file.py",
+                "contentChanges": [
+                    {
+                        "range": {
+                            "start": {"line": 0, "character": 0},
+                            "end": {"line": 0, "character": 1},
+                        },
+                        "text": "x",
+                    }
+                ],
+            }
+        ]
     finally:
         try:
             unsubscribe()
@@ -421,11 +420,7 @@ def test_subprocess_workspace_change_text_document_routes_to_handler():
 
 
 def test_subprocess_window_on_did_open_terminal_routes_to_handler():
-    script = {
-        "window.onDidOpenTerminal": [
-            {"data": {"name": "test-terminal"}, "delay": 0.05}
-        ]
-    }
+    script = {"window.onDidOpenTerminal": [{"data": {"name": "test-terminal"}, "delay": 0.05}]}
 
     client, host_proc, port_queue = _start_client_and_host(script)
     allow_event_loop_start = _prepare_event_loop(client)
@@ -503,7 +498,6 @@ def test_subprocess_watcher_on_delete_routes_to_handler():
     _run_single_event_test("watcher.testwatcher.onDelete", {"uri": "file:///watched/new.txt"})
 
 
-
 def test_subprocess_workspace_on_did_create_files_routes_to_handler():
     _run_single_event_test("workspace.onDidCreateFiles", {"files": [{"uri": "file:///a.txt"}]})
 
@@ -517,7 +511,6 @@ def test_subprocess_workspace_on_did_rename_files_routes_to_handler():
         "workspace.onDidRenameFiles",
         {"files": [{"oldUri": "file:///c_old.txt", "newUri": "file:///c_new.txt"}]},
     )
-
 
 
 def test_subprocess_window_on_did_change_tab_groups_routes_to_handler():

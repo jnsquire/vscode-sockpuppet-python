@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 class Environment:
     """VS Code environment properties and methods."""
 
-    def __init__(self, client: "VSCodeClient"):
+    def __init__(self, client: VSCodeClient):
         self.client = client
         self._cached_properties = {}
 
@@ -222,7 +222,7 @@ class Environment:
 class Workspace:
     """VS Code workspace operations."""
 
-    def __init__(self, client: "VSCodeClient"):
+    def __init__(self, client: VSCodeClient):
         self.client = client
         self._events = WorkspaceEvents(client)
         self._env: Optional[Environment] = None
@@ -490,7 +490,7 @@ class Workspace:
         )
         return result["relativePath"]
 
-    def apply_edit(self, edit: "WorkspaceEdit") -> dict:
+    def apply_edit(self, edit: WorkspaceEdit) -> dict:
         """
         Apply a workspace edit.
 
@@ -594,7 +594,7 @@ class Workspace:
         ignore_create_events: bool = False,
         ignore_change_events: bool = False,
         ignore_delete_events: bool = False,
-    ) -> "FileSystemWatcher":
+    ) -> FileSystemWatcher:
         """
         Create a file system watcher for the given glob pattern.
 

@@ -19,16 +19,16 @@ import uuid
 from typing import TYPE_CHECKING, Optional
 
 from .events import (
-    WindowEvents,
     Event,
-    WindowStateEvent,
-    TextEditorSelectionEvent,
-    VisibleTextEditorsEvent,
-    TextEditorVisibleRangesEvent,
     TerminalEvent,
     TerminalStateEvent,
-        TextEditorOptionsEvent,
-        TextEditorViewColumnEvent,
+    TextEditorOptionsEvent,
+    TextEditorSelectionEvent,
+    TextEditorViewColumnEvent,
+    TextEditorVisibleRangesEvent,
+    VisibleTextEditorsEvent,
+    WindowEvents,
+    WindowStateEvent,
 )
 from .window_types import (
     InputBoxOptions,
@@ -46,10 +46,32 @@ if TYPE_CHECKING:
     from .webview import WebviewOptions, WebviewPanel
 
 
+def _inject_ready_handshake(params):
+    opts = params.get("options", {}) or {}
+    enable_scripts = bool(opts.get("enableScripts", True))
+    handshake_marker = "<!-- __VSSP_READY_HANDSHAKE__ -->"
+    html = params.get("html")
+    if (
+        enable_scripts
+        and isinstance(html, str)
+        and handshake_marker not in html
+    ):
+        handshake_script = (
+            handshake_marker
+            + "<script>(function(){try{var v=(typeof acquireVsCodeApi==='function')?acquireVsCodeApi():null;if(!v)return;function post(){try{v.postMessage({type:'ready'});}catch(e){}}if(document.readyState==='complete'||document.readyState==='interactive'){post();}else{document.addEventListener('DOMContentLoaded',post);}setTimeout(post,500);}catch(e){} })();</script>"
+        )
+        lower = html.lower()
+        idx = lower.rfind("</body>")
+        if idx != -1:
+            params["html"] = html[:idx] + handshake_script + html[idx:]
+        else:
+            params["html"] = html + handshake_script
+
+
 class Window:
     """VS Code window operations."""
 
-    def __init__(self, client: "VSCodeClient"):
+    def __init__(self, client: VSCodeClient):
         self.client = client
         self._events = WindowEvents(client)
         self._tab_groups: Optional[TabGroups] = None
@@ -63,13 +85,17 @@ class Window:
         self._on_did_change_visible_text_editors: Event[VisibleTextEditorsEvent] = Event(
             self.client, "window.onDidChangeVisibleTextEditors"
         )
-        self._on_did_open_terminal: Event[TerminalEvent] = Event(self.client, "window.onDidOpenTerminal")
-        self._on_did_close_terminal: Event[TerminalEvent] = Event(self.client, "window.onDidCloseTerminal")
+        self._on_did_open_terminal: Event[TerminalEvent] = Event(
+            self.client, "window.onDidOpenTerminal"
+        )
+        self._on_did_close_terminal: Event[TerminalEvent] = Event(
+            self.client, "window.onDidCloseTerminal"
+        )
         self._on_did_change_terminal_state: Event[TerminalStateEvent] = Event(
             self.client, "window.onDidChangeTerminalState"
         )
-        self._on_did_change_text_editor_visible_ranges: Event[TextEditorVisibleRangesEvent] = Event(
-            self.client, "window.onDidChangeTextEditorVisibleRanges"
+        self._on_did_change_text_editor_visible_ranges: Event[TextEditorVisibleRangesEvent] = (
+            Event(self.client, "window.onDidChangeTextEditorVisibleRanges")
         )
         self._on_did_change_text_editor_options: Event[TextEditorOptionsEvent] = Event(
             self.client, "window.onDidChangeTextEditorOptions"
@@ -83,7 +109,7 @@ class Window:
 
     # Event subscriptions (VS Code-style API)
     @property
-    def tab_groups(self) -> "TabGroups":
+    def tab_groups(self) -> TabGroups:
         """Get the tab groups manager."""
         if self._tab_groups is None:
             from .tabs import TabGroups
@@ -359,7 +385,7 @@ class Window:
         name: Optional[str] = None,
         shell_path: Optional[str] = None,
         shell_args: Optional[list] = None,
-    ) -> "Terminal":
+    ) -> Terminal:
         """
         Create a terminal.
 
@@ -420,8 +446,8 @@ class Window:
         view_type: Optional[str] = None,
         panel_id: Optional[str] = None,
         show_options: int = 1,
-        options: Optional["WebviewOptions"] = None,
-    ) -> "WebviewPanel":
+        options: Optional[WebviewOptions] = None,
+    ) -> WebviewPanel:
         """
         Create a webview panel with custom HTML content.
 
@@ -466,6 +492,28 @@ class Window:
             # Default options
             params["options"] = WebviewOptions().to_dict()
 
-        self.client._send_request("window.createWebviewPanel", params)
+        # If scripts are enabled for this webview, inject a tiny handshake
+        # snippet which posts { type: 'ready' } back to Python once the
+        # document is interactive/loaded. This helps prevent races where
+        # Python posts messages before the webview JS has installed its
+        # message listener. We avoid double-injecting by checking for a
+        # unique marker.
+        try:
+            _inject_ready_handshake(params)
+        except Exception:
+            # Be conservative: if anything goes wrong, fall back to sending
+            # the original HTML unchanged.
+            pass
 
-        return WebviewPanel(self.client, panel_id, view_type, title)
+        result = self.client._send_request("window.createWebviewPanel", params)
+
+        panel = WebviewPanel(self.client, panel_id, view_type, title)
+        try:
+            # Server returns initial visible/active state
+            panel._visible = bool(result.get("visible", False))
+            panel._active = bool(result.get("active", False))
+        except Exception:
+            # Ignore if result malformatted
+            pass
+
+        return panel

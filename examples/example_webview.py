@@ -2,6 +2,8 @@
 Example: Creating and managing webview panels
 """
 
+import signal
+import threading
 import time
 
 from vscode_sockpuppet import VSCodeClient, WebviewOptions
@@ -12,7 +14,7 @@ class WebviewState:
 
     def __init__(self):
         self.counter = 0
-        self.running = True
+        self.stop_event = threading.Event()
 
     def increment(self):
         """Increment the counter."""
@@ -23,12 +25,27 @@ class WebviewState:
         self.counter = 0
 
     def stop(self):
-        """Stop the main loop."""
-        self.running = False
+        """Signal the main loop to stop."""
+        self.stop_event.set()
+
+    @property
+    def running(self):
+        """Check if still running (not stopped)."""
+        return not self.stop_event.is_set()
 
 
 with VSCodeClient() as client:
     print("Creating webview panel...")
+
+    # Create state object first so signal handler can access it
+    state = WebviewState()
+
+    # Set up signal handler for Ctrl-C that fires stop event
+    def signal_handler(sig, frame):
+        print("\n⌨️  Ctrl-C detected, shutting down...")
+        state.stop()
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     # Create a simple webview with HTML content
     html_content = """
@@ -37,6 +54,7 @@ with VSCodeClient() as client:
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
         <title>Python Webview</title>
         <style>
             body {
@@ -138,9 +156,6 @@ with VSCodeClient() as client:
     ) as panel:
         print(f"Created webview panel: {panel.id}")
 
-        # Create state object to manage counter and running status
-        state = WebviewState()
-
         # Subscribe to disposal event to exit when webview is closed
         def on_dispose():
             print("\n🔔 Webview was closed!")
@@ -180,19 +195,25 @@ with VSCodeClient() as client:
 
         try:
             while state.running:
-                time.sleep(3)
+                # Wait for 3 seconds OR until stop event is set
+                # This is fully event-driven and responds immediately to Ctrl-C
+                if state.stop_event.wait(timeout=3.0):
+                    # Stop event was set (Ctrl-C or webview closed)
+                    break
+
+                # Timeout expired, update counter
                 state.increment()
 
                 # Update the counter from Python
-                if state.running:  # Check if still running before sending
-                    panel.post_message({"type": "updateCounter", "value": state.counter})
+                panel.post_message({"type": "updateCounter", "value": state.counter})
 
                 # Every 10 seconds, update the title
-                if state.counter % 10 == 0 and state.running:
+                if state.counter % 10 == 0:
                     panel.update_title(f"Python Webview Demo - Count: {state.counter}")
 
         except KeyboardInterrupt:
             print("\n⌨️  Keyboard interrupt detected...")
+            state.stop()
         finally:
             if not panel.disposed:
                 print("\nCleaning up...")

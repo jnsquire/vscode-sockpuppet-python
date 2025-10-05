@@ -71,7 +71,9 @@ select = [
     "UP", # pyupgrade
 ]
 ignore = [
-    "E501", # line too long (handled by formatter)
+    "E501",  # line too long (handled by formatter)
+    "UP045", # use Union[X, Y] syntax instead of X | Y,
+    "UP007", # use X | Y syntax instead of Union[X, Y]
 ]
 
 [tool.pytest.ini_options]

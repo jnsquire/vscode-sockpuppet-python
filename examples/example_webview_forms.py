@@ -2,6 +2,7 @@
 Example: Webview with forms - Interactive data collection
 """
 
+import signal
 import sys
 import threading
 import time
@@ -39,19 +40,34 @@ class FormState:
 
     def __init__(self):
         self.submissions = []
-        self.running = True
+        self.stop_event = threading.Event()
 
     def add_submission(self, data):
         """Add a form submission."""
         self.submissions.append(data)
 
     def stop(self):
-        """Stop the main loop."""
-        self.running = False
+        """Signal the main loop to stop."""
+        self.stop_event.set()
+
+    @property
+    def running(self):
+        """Check if still running (not stopped)."""
+        return not self.stop_event.is_set()
 
 
 with VSCodeClient() as client:
     print("Creating webview form demo...")
+
+    # Create state object first
+    state = FormState()
+
+    # Set up signal handler for Ctrl-C that fires stop event
+    def signal_handler(sig, frame):
+        print("\n⌨️  Ctrl-C detected, shutting down...")
+        state.stop()
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     # Start debug stack tracer
     print("Starting debug stack tracer (dumps every 5 seconds)...")
@@ -63,6 +79,7 @@ with VSCodeClient() as client:
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
         <title>Form Demo</title>
         <style>
             body {
@@ -285,12 +302,15 @@ with VSCodeClient() as client:
 
         print("\nWebview form is running!")
         print("Fill out the form to see Python receive and process the data.")
-        print("Close the webview to exit.\n")
+        print("Close the webview to exit or press Ctrl-C.\n")
 
-        # Keep running until panel is closed
-        while state.running:
-            import time
-
-            time.sleep(0.5)
+        # Keep running until panel is closed - event-driven, no polling
+        try:
+            # Wait indefinitely until stop event is set
+            # This responds immediately to Ctrl-C or webview disposal
+            state.stop_event.wait()
+        except KeyboardInterrupt:
+            print("\n⌨️  Keyboard interrupt detected...")
+            state.stop()
 
         print("\n✅ Form demo complete!")

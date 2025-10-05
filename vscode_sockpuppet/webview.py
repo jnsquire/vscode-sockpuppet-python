@@ -4,7 +4,7 @@ Webview API for creating and managing VS Code webview panels.
 
 from typing import TYPE_CHECKING, Any, Callable, Dict, Optional
 
-from .events import WebviewMessageEvent, WebviewViewStateEvent
+from .events import WebviewMessageEvent
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
@@ -130,14 +130,31 @@ class WebviewPanel:
         self._title = title
         self._disposed = False
         # Panel-level message handlers receive the 'message' payload (Any)
-        self._message_handlers: list[Callable[[Any], None]] = []
+        self._message_handlers = []
         # Dispose handlers receive no arguments
-        self._dispose_handlers: list[Callable[[], None]] = []
+        self._dispose_handlers = []
         # View state handlers receive the small state dict
-        self._view_state_handlers: list[Callable[[WebviewViewStateEvent], None]] = []
+        self._view_state_handlers = []
         self._subscription_active = False
         self._dispose_subscription_active = False
         self._view_state_subscription_active = False
+        # Current view state
+        self._visible = False
+        self._active = False
+        # Whether the webview JS has signaled it's ready to receive messages
+        self._ready = False
+        # Buffer messages posted before the webview is ready
+        self._message_buffer = []
+
+    @property
+    def visible(self) -> bool:
+        """Whether the panel is currently visible in the editor."""
+        return self._visible
+
+    @property
+    def active(self) -> bool:
+        """Whether the panel is currently the active (focused) panel."""
+        return self._active
 
     @property
     def id(self) -> str:
@@ -227,9 +244,27 @@ class WebviewPanel:
         if self._disposed:
             raise RuntimeError("Cannot post message to disposed webview panel")
 
+        # If the webview hasn't signaled readiness, buffer the message to avoid
+        # losing messages posted before the JS listener is installed.
+        if not self._ready:
+            self._message_buffer.append(message)
+            return
+
         self._client._send_request(
             "window.postMessageToWebview", {"id": self._id, "message": message}
         )
+
+    def _flush_message_buffer(self) -> None:
+        """Send any buffered messages to the webview in FIFO order."""
+        if not self._message_buffer:
+            return
+        try:
+            for msg in list(self._message_buffer):
+                self._client._send_request(
+                    "window.postMessageToWebview", {"id": self._id, "message": msg}
+                )
+        finally:
+            self._message_buffer.clear()
 
     def as_webview_uri(self, local_uri: str) -> str:
         """
@@ -450,6 +485,21 @@ class WebviewPanel:
                     if not panel:
                         return
                     message = event.get("message")
+                    # Support a simple handshake: JS posts { type: 'ready' }
+                    # to indicate its message listener is installed. When we
+                    # see this, mark the panel ready and flush any buffered
+                    # messages that were queued prior to readiness.
+                    try:
+                        if isinstance(message, dict) and message.get("type") == "ready":
+                            panel._ready = True
+                            try:
+                                panel._flush_message_buffer()
+                            except Exception as e:
+                                print(f"Error flushing webview message buffer: {e}")
+                    except Exception:
+                        # ignore non-dict messages
+                        pass
+
                     for handler in panel._message_handlers[:]:
                         try:
                             handler(message)
@@ -519,9 +569,12 @@ class WebviewPanel:
                     panel = panels_map.get(panel_id)
                     if not panel:
                         return
+                    # Update panel's internal view state
+                    panel._visible = bool(event.get("visible", False))
+                    panel._active = bool(event.get("active", False))
                     state = {
-                        "visible": event.get("visible", False),
-                        "active": event.get("active", False),
+                        "visible": panel._visible,
+                        "active": panel._active,
                     }
                     for handler in panel._view_state_handlers[:]:
                         try:
