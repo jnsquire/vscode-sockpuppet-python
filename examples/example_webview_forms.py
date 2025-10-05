@@ -12,12 +12,13 @@ from vscode_sockpuppet import VSCodeClient, WebviewOptions
 
 def debug_stack_tracer(interval=5):
     """Periodically dump stack traces of all threads for debugging."""
+
     def tracer():
         while True:
             time.sleep(interval)
-            print("\n" + "="*80)
+            print("\n" + "=" * 80)
             print(f"STACK TRACE DUMP - {time.strftime('%H:%M:%S')}")
-            print("="*80)
+            print("=" * 80)
             for thread_id, frame in sys._current_frames().items():
                 thread_name = None
                 for thread in threading.enumerate():
@@ -26,8 +27,8 @@ def debug_stack_tracer(interval=5):
                         break
                 print(f"\n--- Thread: {thread_name} (ID: {thread_id}) ---")
                 traceback.print_stack(frame)
-            print("="*80 + "\n")
-    
+            print("=" * 80 + "\n")
+
     thread = threading.Thread(target=tracer, daemon=True, name="StackTracer")
     thread.start()
     return thread
@@ -51,7 +52,7 @@ class FormState:
 
 with VSCodeClient() as client:
     print("Creating webview form demo...")
-    
+
     # Start debug stack tracer
     print("Starting debug stack tracer (dumps every 5 seconds)...")
     debug_stack_tracer(interval=5)
@@ -250,7 +251,7 @@ with VSCodeClient() as client:
         def handle_message(message):
             if message.get("type") == "formSubmit":
                 data = message.get("data", {})
-                print(f"\n📩 Form submission received:")
+                print("\n📩 Form submission received:")
                 print(f"  Name: {data.get('name')}")
                 print(f"  Email: {data.get('email')}")
                 print(f"  Role: {data.get('role', 'Not specified')}")
@@ -261,15 +262,10 @@ with VSCodeClient() as client:
                 state.add_submission(data)
 
                 # Send updated submissions back to webview
-                panel.post_message({
-                    "type": "updateSubmissions",
-                    "submissions": state.submissions
-                })
+                panel.post_message({"type": "updateSubmissions", "submissions": state.submissions})
 
                 # Show notification
-                client.window.show_information_message(
-                    f"Form submitted by {data.get('name')}"
-                )
+                client.window.show_information_message(f"Form submitted by {data.get('name')}")
 
         print("Adding message handler...")
 
@@ -294,6 +290,7 @@ with VSCodeClient() as client:
         # Keep running until panel is closed
         while state.running:
             import time
+
             time.sleep(0.5)
 
         print("\n✅ Form demo complete!")

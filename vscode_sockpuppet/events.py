@@ -1,11 +1,103 @@
-"""
-Event emitter classes for VS Code-style event subscriptions
+"""Lightweight EventEmitter used by the client.
+
+Provides a small API similar to VS Code's EventEmitter:event pair:
+  - emitter.event(handler) -> unsubscribe callable
+  - emitter.fire(data) -> notify handlers
+
+Also supports optional hooks when the first listener is added and when the
+last listener is removed so callers can perform subscription/unsubscription
+side-effects (for example, informing a server).
 """
 
-from typing import TYPE_CHECKING, Any, Callable
+from __future__ import annotations
+
+import threading
+from typing import TYPE_CHECKING, Any, Callable, Generic, TypeVar
 
 if TYPE_CHECKING:
     from .client import VSCodeClient
+
+T = TypeVar("T")
+
+
+class EventEmitter(Generic[T]):
+    """Tiny thread-safe event emitter.
+
+    on_first_add: optional callable invoked once when the first handler is
+    registered. on_no_listeners: optional callable invoked once when the
+    last handler is removed.
+    """
+
+    def __init__(
+        self,
+        on_first_add: Callable[[], None] | None = None,
+        on_no_listeners: Callable[[], None] | None = None,
+    ) -> None:
+        self._handlers: list[Callable[[T], None]] = []
+        self._lock = threading.Lock()
+        self._on_first_add = on_first_add
+        self._on_no_listeners = on_no_listeners
+
+    def event(self, handler: Callable[[T], None]) -> Callable[[], None]:
+        """Register a handler and return an unsubscribe callable."""
+        first = False
+        with self._lock:
+            if not self._handlers:
+                first = True
+            self._handlers.append(handler)
+
+        if first and self._on_first_add:
+            try:
+                self._on_first_add()
+            except Exception:
+                # Avoid bubbling subscription hook errors into callers
+                pass
+
+        def _dispose() -> None:
+            no_listeners = False
+            with self._lock:
+                if handler in self._handlers:
+                    self._handlers.remove(handler)
+                if not self._handlers:
+                    no_listeners = True
+
+            if no_listeners and self._on_no_listeners:
+                try:
+                    self._on_no_listeners()
+                except Exception:
+                    pass
+
+        return _dispose
+
+    def remove(self, handler: Callable[[T], None]) -> None:
+        """Remove a specific handler."""
+        no_listeners = False
+        with self._lock:
+            if handler in self._handlers:
+                self._handlers.remove(handler)
+            if not self._handlers:
+                no_listeners = True
+
+        if no_listeners and self._on_no_listeners:
+            try:
+                self._on_no_listeners()
+            except Exception:
+                pass
+
+    def has_listeners(self) -> bool:
+        with self._lock:
+            return bool(self._handlers)
+
+    def fire(self, data: T) -> None:
+        with self._lock:
+            handlers = list(self._handlers)
+
+        for h in handlers:
+            try:
+                h(data)
+            except Exception as e:
+                # Keep this lightweight — printing is acceptable for now
+                print(f"Error in EventEmitter handler: {e}")
 
 
 class Event:
@@ -16,7 +108,7 @@ class Event:
     subscription interface.
     """
 
-    def __init__(self, client: "VSCodeClient", event_name: str):
+    def __init__(self, client: VSCodeClient, event_name: str):
         """
         Initialize an event.
 
@@ -58,7 +150,7 @@ class WindowEvents:
     Provides VS Code-style event subscription with on_did_* methods.
     """
 
-    def __init__(self, client: "VSCodeClient"):
+    def __init__(self, client: VSCodeClient):
         """Initialize window events."""
         self._client = client
 
@@ -233,7 +325,7 @@ class WorkspaceEvents:
     Provides VS Code-style event subscription with on_did_* methods.
     """
 
-    def __init__(self, client: "VSCodeClient"):
+    def __init__(self, client: VSCodeClient):
         """Initialize workspace events."""
         self._client = client
 

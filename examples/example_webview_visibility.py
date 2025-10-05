@@ -59,7 +59,7 @@ with VSCodeClient() as client:
     </head>
     <body>
         <h1>👁️ View State Tracking Demo</h1>
-        
+
         <div class="info-box">
             <p><strong>Try these actions to see view state changes:</strong></p>
             <ul>
@@ -95,17 +95,17 @@ with VSCodeClient() as client:
         def on_view_state_change(view_state):
             visible = view_state["visible"]
             active = view_state["active"]
-            
+
             # Track state changes
             visibility_changed = visible != state.is_visible
             active_changed = active != state.is_active
-            
+
             state.is_visible = visible
             state.is_active = active
 
             # Log changes
             if visibility_changed or active_changed:
-                print(f"\n🔔 View State Changed:")
+                print("\n🔔 View State Changed:")
                 if visibility_changed:
                     status = "VISIBLE" if visible else "HIDDEN"
                     print(f"   Visibility: {status}")
@@ -124,6 +124,7 @@ with VSCodeClient() as client:
         # Keep running until panel is closed
         while state.running:
             import time
+
             time.sleep(0.5)
 
         print("\n✅ View state demo complete!")

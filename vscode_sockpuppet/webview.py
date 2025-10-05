@@ -8,6 +8,103 @@ if TYPE_CHECKING:
     from .client import VSCodeClient
 
 
+# Global registries so we create at most one "webview.onDidReceiveMessage"
+# subscription per VSCodeClient and dispatch messages to the correct
+# WebviewPanel instance by id.
+#
+# _global_message_registry: client -> { panel_id: WebviewPanel }
+_global_message_registry: Dict["VSCodeClient", Dict[str, "WebviewPanel"]] = {}
+# _global_message_handler_ref: client -> handler callable (so we can unsubscribe)
+_global_message_handler_ref: Dict["VSCodeClient", Callable[[Any], None]] = {}
+
+
+def _unregister_panel_from_global(client: "VSCodeClient", panel_id: str) -> None:
+    """Remove a panel from the global registry and unsubscribe the global
+    handler for the client if no panels remain.
+    """
+    try:
+        panels = _global_message_registry.get(client)
+        if not panels:
+            return
+
+        if panel_id in panels:
+            del panels[panel_id]
+
+        # If no panels remain for this client, remove registry and
+        # unsubscribe the global handler.
+        if not panels:
+            # delete registry entry
+            del _global_message_registry[client]
+            # unsubscribe global handler if present
+            handler = _global_message_handler_ref.pop(client, None)
+            if handler is not None:
+                try:
+                    client.unsubscribe("webview.onDidReceiveMessage", handler)
+                except Exception:
+                    # Best effort; ignore errors during cleanup
+                    pass
+    except Exception as e:
+        print(f"Error unregistering webview panel from global registry: {e}")
+
+
+# Dispose event global registries
+_global_dispose_registry: Dict["VSCodeClient", Dict[str, "WebviewPanel"]] = {}
+_global_dispose_handler_ref: Dict["VSCodeClient", Callable[[Any], None]] = {}
+
+
+def _unregister_dispose_panel_from_global(client: "VSCodeClient", panel_id: str) -> None:
+    """Remove a panel from the global dispose registry and unsubscribe the
+    global dispose handler for the client if no panels remain.
+    """
+    try:
+        panels = _global_dispose_registry.get(client)
+        if not panels:
+            return
+
+        if panel_id in panels:
+            del panels[panel_id]
+
+        if not panels:
+            del _global_dispose_registry[client]
+            handler = _global_dispose_handler_ref.pop(client, None)
+            if handler is not None:
+                try:
+                    client.unsubscribe("webview.onDidDispose", handler)
+                except Exception:
+                    pass
+    except Exception as e:
+        print(f"Error unregistering webview dispose panel: {e}")
+
+
+# View state event global registries
+_global_viewstate_registry: Dict["VSCodeClient", Dict[str, "WebviewPanel"]] = {}
+_global_viewstate_handler_ref: Dict["VSCodeClient", Callable[[Any], None]] = {}
+
+
+def _unregister_viewstate_panel_from_global(client: "VSCodeClient", panel_id: str) -> None:
+    """Remove a panel from the global view-state registry and unsubscribe the
+    handler for the client if no panels remain.
+    """
+    try:
+        panels = _global_viewstate_registry.get(client)
+        if not panels:
+            return
+
+        if panel_id in panels:
+            del panels[panel_id]
+
+        if not panels:
+            del _global_viewstate_registry[client]
+            handler = _global_viewstate_handler_ref.pop(client, None)
+            if handler is not None:
+                try:
+                    client.unsubscribe("webview.onDidChangeViewState", handler)
+                except Exception:
+                    pass
+    except Exception as e:
+        print(f"Error unregistering webview viewstate panel: {e}")
+
+
 class WebviewPanel:
     """
     Represents a VS Code webview panel.
@@ -204,7 +301,7 @@ class WebviewPanel:
         # Add handler to our list
         self._message_handlers.append(handler)
 
-        # Set up global subscription if not already active
+        # Set up (or register with) global subscription for this client
         if not self._subscription_active:
             self._setup_message_subscription()
             self._subscription_active = True
@@ -213,6 +310,11 @@ class WebviewPanel:
         def unsubscribe():
             if handler in self._message_handlers:
                 self._message_handlers.remove(handler)
+
+            # If no message handlers left for this panel, remove panel from
+            # registry so it no longer receives dispatched messages.
+            if not self._message_handlers:
+                _unregister_panel_from_global(self._client, self._id)
 
         return unsubscribe
 
@@ -248,7 +350,7 @@ class WebviewPanel:
         # Add handler to our list
         self._dispose_handlers.append(handler)
 
-        # Set up global subscription if not already active
+        # Register with global dispose dispatcher for this client
         if not self._dispose_subscription_active:
             self._setup_dispose_subscription()
             self._dispose_subscription_active = True
@@ -257,6 +359,11 @@ class WebviewPanel:
         def unsubscribe():
             if handler in self._dispose_handlers:
                 self._dispose_handlers.remove(handler)
+
+            # If no dispose handlers remain for this panel, remove it from
+            # the global dispose registry.
+            if not self._dispose_handlers:
+                _unregister_dispose_panel_from_global(self._client, self._id)
 
         return unsubscribe
 
@@ -292,7 +399,7 @@ class WebviewPanel:
         # Add handler to our list
         self._view_state_handlers.append(handler)
 
-        # Set up global subscription if not already active
+        # Register with global view-state dispatcher for this client
         if not self._view_state_subscription_active:
             self._setup_view_state_subscription()
             self._view_state_subscription_active = True
@@ -302,62 +409,122 @@ class WebviewPanel:
             if handler in self._view_state_handlers:
                 self._view_state_handlers.remove(handler)
 
+            if not self._view_state_handlers:
+                _unregister_viewstate_panel_from_global(self._client, self._id)
+
         return unsubscribe
 
     def _setup_message_subscription(self) -> None:
-        """Set up the global webview message event subscription."""
+        """Register this panel with the global dispatcher for this client.
 
-        def global_handler(event):
-            # Filter messages for this specific panel
-            # event is the data dict with 'id' and 'message' keys
-            if event.get("id") == self._id:
-                message = event["message"]
-                # Call all registered handlers
-                for handler in self._message_handlers[:]:
-                    try:
-                        handler(message)
-                    except Exception as e:
-                        print(f"Error in webview message handler: {e}")
+        Instead of creating a new subscription per panel, we maintain a single
+        event subscription per VSCodeClient and dispatch incoming messages to
+        the correct panel based on the event's 'id' field.
+        """
 
-        self._client.subscribe("webview.onDidReceiveMessage", global_handler)
+        client = self._client
+
+        # Ensure registry for this client exists
+        panels = _global_message_registry.setdefault(client, {})
+        panels[self._id] = self
+
+        # If we don't yet have a global handler installed for this client,
+        # create and subscribe it.
+        if client not in _global_message_handler_ref:
+
+            def _global_handler(event):
+                # event expected to be a dict with 'id' and 'message'
+                try:
+                    panel_id = event.get("id")
+                    if not panel_id:
+                        return
+                    panels_map = _global_message_registry.get(client)
+                    if not panels_map:
+                        return
+                    panel = panels_map.get(panel_id)
+                    if not panel:
+                        return
+                    message = event.get("message")
+                    for handler in panel._message_handlers[:]:
+                        try:
+                            handler(message)
+                        except Exception as e:
+                            print(f"Error in webview message handler: {e}")
+                except Exception as e:
+                    print(f"Error in global webview message dispatch: {e}")
+
+            # keep reference so we can unsubscribe later if needed
+            _global_message_handler_ref[client] = _global_handler
+            client.subscribe("webview.onDidReceiveMessage", _global_handler)
 
     def _setup_dispose_subscription(self) -> None:
-        """Set up the global webview disposal event subscription."""
+        """Register this panel with a global dispose dispatcher for the client."""
 
-        def global_handler(event):
-            # Filter disposal events for this specific panel
-            if event.get("id") == self._id:
-                # Mark as disposed
-                self._disposed = True
-                # Call all registered dispose handlers
-                for handler in self._dispose_handlers[:]:
-                    try:
-                        handler()
-                    except Exception as e:
-                        print(f"Error in webview dispose handler: {e}")
-                # Clear handlers after calling them
-                self._dispose_handlers.clear()
+        client = self._client
+        panels = _global_dispose_registry.setdefault(client, {})
+        panels[self._id] = self
 
-        self._client.subscribe("webview.onDidDispose", global_handler)
+        if client not in _global_dispose_handler_ref:
+
+            def _global_dispose_handler(event):
+                try:
+                    panel_id = event.get("id")
+                    if not panel_id:
+                        return
+                    panels_map = _global_dispose_registry.get(client)
+                    if not panels_map:
+                        return
+                    panel = panels_map.get(panel_id)
+                    if not panel:
+                        return
+                    # Mark as disposed and call handlers
+                    panel._disposed = True
+                    for handler in panel._dispose_handlers[:]:
+                        try:
+                            handler()
+                        except Exception as e:
+                            print(f"Error in webview dispose handler: {e}")
+                    panel._dispose_handlers.clear()
+                except Exception as e:
+                    print(f"Error in global webview dispose dispatch: {e}")
+
+            _global_dispose_handler_ref[client] = _global_dispose_handler
+            client.subscribe("webview.onDidDispose", _global_dispose_handler)
 
     def _setup_view_state_subscription(self) -> None:
-        """Set up the global webview view state change event subscription."""
+        """Register this panel with a global view-state dispatcher for the client."""
 
-        def global_handler(event):
-            # Filter events for this specific panel
-            if event.get("id") == self._id:
-                state = {
-                    "visible": event.get("visible", False),
-                    "active": event.get("active", False)
-                }
-                # Call all registered view state handlers
-                for handler in self._view_state_handlers[:]:
-                    try:
-                        handler(state)
-                    except Exception as e:
-                        print(f"Error in webview view state handler: {e}")
+        client = self._client
+        panels = _global_viewstate_registry.setdefault(client, {})
+        panels[self._id] = self
 
-        self._client.subscribe("webview.onDidChangeViewState", global_handler)
+        if client not in _global_viewstate_handler_ref:
+
+            def _global_viewstate_handler(event):
+                try:
+                    panel_id = event.get("id")
+                    if not panel_id:
+                        return
+                    panels_map = _global_viewstate_registry.get(client)
+                    if not panels_map:
+                        return
+                    panel = panels_map.get(panel_id)
+                    if not panel:
+                        return
+                    state = {
+                        "visible": event.get("visible", False),
+                        "active": event.get("active", False),
+                    }
+                    for handler in panel._view_state_handlers[:]:
+                        try:
+                            handler(state)
+                        except Exception as e:
+                            print(f"Error in webview view state handler: {e}")
+                except Exception as e:
+                    print(f"Error in global webview viewstate dispatch: {e}")
+
+            _global_viewstate_handler_ref[client] = _global_viewstate_handler
+            client.subscribe("webview.onDidChangeViewState", _global_viewstate_handler)
 
     def dispose(self) -> None:
         """
@@ -380,6 +547,14 @@ class WebviewPanel:
                 print(f"Error in webview dispose handler: {e}")
         # Clear handlers after calling them
         self._dispose_handlers.clear()
+
+        # Remove from global message registry so the dispatcher no longer
+        # attempts to route messages to this panel.
+        _unregister_panel_from_global(self._client, self._id)
+        # Also remove from dispose and viewstate registries so client-level
+        # handlers can be unsubscribed when no panels remain.
+        _unregister_dispose_panel_from_global(self._client, self._id)
+        _unregister_viewstate_panel_from_global(self._client, self._id)
 
     def __enter__(self):
         """Context manager entry."""
