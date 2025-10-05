@@ -1754,12 +1754,12 @@
 
 
                   <details class="quote">
-                    <summary>Source code in <code>vscode_sockpuppet/events.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-153">153</a></span>
-<span class="normal"><a href="#__codelineno-0-154">154</a></span>
-<span class="normal"><a href="#__codelineno-0-155">155</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">):</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize window events.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
+                    <summary>Source code in <code>vscode_sockpuppet/events/window.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-79">79</a></span>
+<span class="normal"><a href="#__codelineno-0-80">80</a></span>
+<span class="normal"><a href="#__codelineno-0-81">81</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">):</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize window events.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -1805,7 +1805,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1860,7 +1860,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1915,7 +1915,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1969,7 +1969,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2023,7 +2023,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2075,7 +2075,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2129,7 +2129,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2183,7 +2183,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2238,7 +2238,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2292,7 +2292,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2357,12 +2357,12 @@
 
 
                   <details class="quote">
-                    <summary>Source code in <code>vscode_sockpuppet/events.py</code></summary>
-                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">):</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize workspace events.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
+                    <summary>Source code in <code>vscode_sockpuppet/events/workspace.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-79">79</a></span>
+<span class="normal"><a href="#__codelineno-0-80">80</a></span>
+<span class="normal"><a href="#__codelineno-0-81">81</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">):</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize workspace events.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">client</span>
 </code></pre></div></td></tr></table></div>
                   </details>
 
@@ -2408,7 +2408,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2462,7 +2462,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2516,7 +2516,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2570,7 +2570,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2626,7 +2626,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2681,7 +2681,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2735,7 +2735,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2790,7 +2790,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2845,7 +2845,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="vscode_sockpuppet.events.Event">Event</span></code>
+                  <code><span title="vscode_sockpuppet.events.core.Event">Event</span></code>
             </td>
             <td>
               <div class="doc-md-description">
