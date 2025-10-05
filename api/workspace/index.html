@@ -2430,7 +2430,7 @@
 
 
 <a href="#vscode_sockpuppet.workspace.Workspace" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Workspace</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="s1">&#39;VSCodeClient&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Workspace</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -2482,7 +2482,7 @@
 <span class="normal"><a href="#__codelineno-0-257">257</a></span>
 <span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
-<span class="normal"><a href="#__codelineno-0-260">260</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="s2">&quot;VSCodeClient&quot;</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">):</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_events</span> <span class="o">=</span> <span class="n">WorkspaceEvents</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Environment</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -3817,7 +3817,7 @@ folder name when multiple folders exist</p>
 
 
 <a href="#vscode_sockpuppet.workspace.Workspace.apply_edit" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">apply_edit</span><span class="p">(</span><span class="n">edit</span><span class="p">:</span> <span class="s1">&#39;WorkspaceEdit&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">apply_edit</span><span class="p">(</span><span class="n">edit</span><span class="p">:</span> <span class="n">WorkspaceEdit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3843,7 +3843,7 @@ include text changes, file creates, file deletes, and file renames.</p>
                 <code>edit</code>
             </td>
             <td>
-                  <code>&#39;WorkspaceEdit&#39;</code>
+                  <code><a class="autorefs autorefs-internal" title="            WorkspaceEdit (vscode_sockpuppet.window_types.WorkspaceEdit)" href="../types/#vscode_sockpuppet.window_types.WorkspaceEdit">WorkspaceEdit</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4004,7 +4004,7 @@ result = client.workspace.apply_edit(edit)</p>
 <span class="normal"><a href="#__codelineno-0-559">559</a></span>
 <span class="normal"><a href="#__codelineno-0-560">560</a></span>
 <span class="normal"><a href="#__codelineno-0-561">561</a></span>
-<span class="normal"><a href="#__codelineno-0-562">562</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="k">def</span><span class="w"> </span><span class="nf">apply_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edit</span><span class="p">:</span> <span class="s2">&quot;WorkspaceEdit&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal"><a href="#__codelineno-0-562">562</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-493" name="__codelineno-0-493"></a><span class="k">def</span><span class="w"> </span><span class="nf">apply_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edit</span><span class="p">:</span> <span class="n">WorkspaceEdit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-495" name="__codelineno-0-495"></a><span class="sd">    Apply a workspace edit.</span>
 <a id="__codelineno-0-496" name="__codelineno-0-496"></a>
@@ -4245,7 +4245,7 @@ value = config.get('editor.fontSize')</p>
 
 
 <a href="#vscode_sockpuppet.workspace.Workspace.create_file_system_watcher" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_file_system_watcher</span><span class="p">(</span><span class="n">glob_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_create_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ignore_change_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ignore_delete_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;FileSystemWatcher&#39;</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_file_system_watcher</span><span class="p">(</span><span class="n">glob_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ignore_create_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ignore_change_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">ignore_delete_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FileSystemWatcher</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4344,7 +4344,7 @@ value = config.get('editor.fontSize')</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>&#39;FileSystemWatcher&#39;</code>
+                  <code><a class="autorefs autorefs-internal" title="            FileSystemWatcher (vscode_sockpuppet.filewatcher.FileSystemWatcher)" href="../filewatcher/#vscode_sockpuppet.filewatcher.FileSystemWatcher">FileSystemWatcher</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4446,7 +4446,7 @@ dispose2 = watcher.on_did_change(on_python_file_changed)</p>
 <a id="__codelineno-0-594" name="__codelineno-0-594"></a>    <span class="n">ignore_create_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <a id="__codelineno-0-595" name="__codelineno-0-595"></a>    <span class="n">ignore_change_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <a id="__codelineno-0-596" name="__codelineno-0-596"></a>    <span class="n">ignore_delete_events</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;FileSystemWatcher&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-597" name="__codelineno-0-597"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FileSystemWatcher</span><span class="p">:</span>
 <a id="__codelineno-0-598" name="__codelineno-0-598"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-599" name="__codelineno-0-599"></a><span class="sd">    Create a file system watcher for the given glob pattern.</span>
 <a id="__codelineno-0-600" name="__codelineno-0-600"></a>
@@ -4527,7 +4527,7 @@ dispose2 = watcher.on_did_change(on_python_file_changed)</p>
 
 
 <a href="#vscode_sockpuppet.workspace.Environment" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Environment</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="s1">&#39;VSCodeClient&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Environment</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4546,7 +4546,7 @@ dispose2 = watcher.on_did_change(on_python_file_changed)</p>
                     <summary>Source code in <code>vscode_sockpuppet/workspace.py</code></summary>
                     <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-30">30</a></span>
 <span class="normal"><a href="#__codelineno-0-31">31</a></span>
-<span class="normal"><a href="#__codelineno-0-32">32</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="s2">&quot;VSCodeClient&quot;</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-32">32</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">VSCodeClient</span><span class="p">):</span>
 <a id="__codelineno-0-31" name="__codelineno-0-31"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
 <a id="__codelineno-0-32" name="__codelineno-0-32"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_cached_properties</span> <span class="o">=</span> <span class="p">{}</span>
 </code></pre></div></td></tr></table></div>
